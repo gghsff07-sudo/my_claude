@@ -194,3 +194,24 @@ byte-level vocab covers every byte, so an unk token is unnecessary by design (sa
   NO remote code — `AutoTokenizer.from_pretrained` loads it as `TokenizersBackend`.
   Note (5.x): `apply_chat_template(tokenize=True)` returns a `BatchEncoding`
   (`input_ids`/`attention_mask`), not a bare id list.
+- **Step 6 (tests)** — `tests/test_hf_compat.py`: 10 end-to-end tests over the
+  built `hf_model/`: `AutoModelForCausalLM.from_pretrained(trust_remote_code=True)`
+  loads the real 3,285,504-param model with the head re-tied;
+  save_pretrained→from_pretrained round trip is logits-identical; `generate()`
+  honors temperature/top_p/top_k/max_new_tokens/repetition_penalty; greedy
+  `generate()` == manual cached argmax stepping; attention-mask path matches the
+  unmasked prefix; full chat pipeline (chat template → generate → extract)
+  runs. Full suite: **53 passed** (24 pre-existing + 29 HF).
+- **Step 7 (model card)** — `hf_model/README.md` with YAML frontmatter
+  (license apache-2.0, library_name transformers, pipeline_tag text-generation,
+  tags, language en), usage snippet, training-data summary, honest eval numbers
+  (train 3.6209/ppl 37.37, val 4.1600/ppl 64.07 with the run2-flattering caveat
+  and a verbatim word-soup sample), intended use, limitations/safety, and the
+  explicit "small educational model, not equivalent to Fable 5.2" statement.
+- **Step 8 (upload)** — `scripts/push_to_hub.py` (HF_TOKEN from env/.env, never
+  printed; `--repo-id` required; `--private`; `--dry-run`; owner-vs-token check;
+  file allowlist). Uploaded for real to
+  **https://huggingface.co/dev-sandakelum/fable-mini** (commit `feb6b86f`,
+  13.29 MB, 10 files). GOAL verified from the Hub: the exact snippet from the
+  assignment loads and generates; hub weights vs original `.pt` checkpoint:
+  **max |Δlogits| = 0.0**.
