@@ -21,17 +21,23 @@ model's honest capability summary.
 | Evaluation (loss, perplexity, samples) | `fable_lm/eval.py` → `EVAL.md` |
 | Synthetic Fable-style dialogues (training data) | `data/dialogues/` |
 | Shipped checkpoint (fp16, ~7.6 MB) | `models/fable-mini-final.pt` |
-| Tests (24: tokenizer, model, data, training, generation) | `tests/` |
+| Tests (53: tokenizer, model, data, training, generation, HF compat) | `tests/` |
+| HF wrapper (config, modeling — self-contained remote code) | `hf_fable/` |
+| HF conversion scripts (weights, tokenizer, upload, Space) | `scripts/` |
+| HF-format model folder (Hub artifact) | `hf_model/` (weights gitignored) |
+| HF audit + per-step results log | `HF_NOTES.md` |
+| Gradio demo (Hub id or local path, streaming) | `app.py` + `space/README.md` |
+| Colab notebook (load via transformers) | `notebooks/fable_mini_colab.ipynb` |
 
 ## Setup
 
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-python -m pytest tests/ -q        # 24 tests
+python -m pytest tests/ -q        # 53 tests (24 original + 29 HF compat)
 ```
 
-Python 3.13, PyTorch 2.15.0+cpu. No other dependencies (stdlib `re`, `json`,
-`csv`, `math`, `argparse` only).
+Python 3.12, PyTorch 2.15.0+cpu. The HF side additionally needs
+`transformers==5.23.0`, `safetensors`, `tokenizers` (see `requirements.txt`).
 
 ## Usage
 
@@ -54,6 +60,86 @@ python -m fable_lm.eval
 
 The chat CLI loads `checkpoints/best.pt` by default; `--checkpoint` takes any
 other path (e.g. `models/fable-mini-final.pt`, the shipped fp16 copy).
+
+## Hugging Face
+
+The model is on the Hub and loadable like any HF model (verified: Hub weights
+are bit-identical to the original checkpoint, max |Δlogits| = 0.0):
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+tok = AutoTokenizer.from_pretrained("dev-sandakelum/fable-mini", trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained("dev-sandakelum/fable-mini", trust_remote_code=True)
+
+messages = [{"role": "system", "content": "You are a concise, warm assistant."},
+            {"role": "user", "content": "Hi!"}]
+enc = tok.apply_chat_template(messages, tokenize=True, add_generation_prompt=True,
+                              return_dict=True, return_tensors="pt")
+out = model.generate(enc.input_ids, max_new_tokens=64, do_sample=True,
+                     temperature=0.8, top_p=0.9, repetition_penalty=1.2,
+                     pad_token_id=256, eos_token_id=257)
+print(tok.decode(out[0][enc.input_ids.shape[1]:]))
+```
+
+- **Repo**: https://huggingface.co/dev-sandakelum/fable-mini
+  (model card with YAML metadata, honest eval, usage snippet).
+- **Files**: `config.json` + `auto_map` (remote code `configuration_fable.py` /
+  `modeling_fable.py`, also usable locally without remote code via `import hf_fable`),
+  `model.safetensors` (fp32; tied `head.weight` dropped and re-tied on load),
+  `generation_config.json`, `tokenizer.json` / `tokenizer_config.json` /
+  `special_tokens_map.json` / `chat_template.jinja`.
+- **Parity**: logits of the HF wrapper vs `fable_lm.FableLM` are bit-identical
+  on the same weights (max |Δ| = 0.0, fp32, T ∈ {7, 33, 128, 512}); tokenizer
+  ids identical on 40/40 corpus + edge-case texts; chat template renders
+  exactly `fable_lm`'s prompt format (`<system>…</system>` + `User:`/`Assistant:` turns).
+- **`generate()`** supports `temperature`, `top_p`, `top_k`, `max_new_tokens`,
+  `repetition_penalty` with a `DynamicCache` KV cache; greedy `generate()` equals
+  manual cached argmax stepping (tested).
+
+### Converting weights
+
+```bash
+# .pt checkpoint -> hf_model/ (config.json, model.safetensors, generation_config.json)
+python scripts/convert_to_hf.py                          # fp32, parity-checked
+python scripts/convert_to_hf.py --checkpoint models/fable-mini-final.pt --fp16
+
+# repo tokenizer -> HF fast tokenizer files (+ corpus-wide parity verification)
+python scripts/convert_tokenizer_to_hf.py
+```
+
+### Uploading to the Hub
+
+```bash
+export HF_TOKEN=hf_...           # or put it in .env (gitignored; see .env.example)
+python scripts/push_to_hub.py --repo-id dev-sandakelum/fable-mini --dry-run
+python scripts/push_to_hub.py --repo-id dev-sandakelum/fable-mini [--private]
+```
+
+The script checks the token, verifies the repo owner matches the token identity,
+and only uploads the allowlisted artifact files. This exact flow was used for the
+live upload (commit `feb6b86f`).
+
+### Deploying the Space
+
+```bash
+python app.py                   # local: loads Hub repo id (or --model hf_model)
+python scripts/deploy_space.py --repo-id dev-sandakelum/fable-mini-demo
+```
+
+`app.py` is a Gradio Blocks chat (streaming via `TextIteratorStreamer`,
+sampling sliders, system-prompt box) that loads through plain transformers.
+`space/README.md` carries the Space metadata (`sdk: gradio`, `app_file: app.py`,
+pinned `requirements.txt`).
+
+**Known limitation (documented honestly)**: creating a Gradio Space on the free
+tier currently returns HTTP 402 — HF requires a PRO subscription for
+Gradio/Docker Spaces on free cpu-basic. The Space is fully packaged and the
+deploy script works (verified dry-run); hosting it needs a PRO subscription or
+a static Space. The demo itself runs locally: `python app.py`.
+
+A Colab notebook that loads the model through transformers is at
+`notebooks/fable_mini_colab.ipynb` (also in `download/`).
 
 ## Architecture summary
 
