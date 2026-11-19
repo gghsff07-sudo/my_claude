@@ -84,6 +84,8 @@ def main() -> None:
     ap.add_argument("--run-name", type=str, default="run1")
     ap.add_argument("--vocab-size", type=int, default=2048)
     ap.add_argument("--data-mult", type=int, default=1, help="repeat corpus N times (more windows)")
+    ap.add_argument("--dialogue-mult", type=int, default=1,
+                    help="extra repetition for dialogue docs (upweights chat style)")
     ap.add_argument("--resume", type=str, default="", help="checkpoint path to resume from")
     args = ap.parse_args()
 
@@ -96,7 +98,11 @@ def main() -> None:
     if not docs:
         raise SystemExit("No corpus documents found — run from the repo root.")
     train_texts, val_texts = split_documents(docs)
-    print(f"corpus: {len(docs)} documents ({len(train_texts)} train / {len(val_texts)} val)")
+    if args.dialogue_mult > 1:
+        # upweight chat-format data: repeat the short dialogue docs only
+        extra = [t for n, t in docs if n[:2].isdigit()]
+        train_texts = train_texts + extra * (args.dialogue_mult - 1)
+    print(f"corpus: {len(docs)} documents ({len(train_texts)} train / {len(val_texts)} val texts)")
 
     tok_path = REPO / "data" / "tokenizer.json"
     if tok_path.is_file():
