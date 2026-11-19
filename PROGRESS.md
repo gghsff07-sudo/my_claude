@@ -1,23 +1,19 @@
 # PROGRESS — running checklist
 
-Steps are marked done when **committed locally**. Push status is tracked separately
-(see the blocker note below).
+Steps are marked done when **committed and pushed**.
 
-## Push blocker (open)
+## Push blocker (RESOLVED)
 
-The provided fine-grained PAT authenticates as `gghsff07-sudo` (repo owner) but its
-**Contents permission is read-only**. `git push` and GitHub API writes both return
-403 ("Resource not accessible by personal access token"). No workaround attempted,
-per the task's data rules. All steps are committed locally on `main`; the full
-history pushes with a single `git push origin main` once the token has Contents:
-read+write on `gghsff07-sudo/my_claude`.
+The initially provided PAT had Contents: read-only (pushes returned 403). The
+token's permissions were later updated on GitHub's side; pushes now work. Steps 1–3
+were pushed retroactively once access was granted.
 
 ## Checklist
 
 - [x] Step 0: repo setup — remote added, remote `main` merged (unrelated histories), torch 2.15.0+cpu installed
-- [x] Step 1: `research/` — 5.1 document analysis, 5.2 delta assumptions, miniature system card (commit `step 1`)
-- [x] Step 2: `STUDY.md` — behaviors/traits/capabilities to imitate (commit `step 2`)
-- [ ] Step 3: `DESIGN.md` — architecture, context length, assumptions
+- [x] Step 1: `research/` — 5.1 document analysis, 5.2 delta assumptions, miniature system card (pushed)
+- [x] Step 2: `STUDY.md` — behaviors/traits to imitate (pushed)
+- [x] Step 3: `DESIGN.md` — architecture, context length, assumptions (pushed)
 - [ ] Step 4: tokenizer (byte-level BPE) + tests
 - [ ] Step 5: transformer model + forward-pass unit test
 - [ ] Step 6: training pipeline (data, LR schedule, clipping, checkpoints, logging)
