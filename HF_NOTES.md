@@ -215,3 +215,17 @@ byte-level vocab covers every byte, so an unk token is unnecessary by design (sa
   13.29 MB, 10 files). GOAL verified from the Hub: the exact snippet from the
   assignment loads and generates; hub weights vs original `.pt` checkpoint:
   **max |Δlogits| = 0.0**.
+- **Step 9 (Space)** — `app.py` (Gradio Blocks chat: loads Hub repo id or local
+  path via `AutoModelForCausalLM`/`AutoTokenizer` + `trust_remote_code`, applies
+  the chat template, streams with `TextIteratorStreamer`, sliders for
+  temperature/top-p/max-new-tokens, system-prompt box, honest "word soup"
+  framing), `space/README.md` (sdk gradio 6.3.0, app_file app.py), pinned
+  `requirements.txt`. Local smoke test: model loads from `hf_model/`, one
+  streamed reply = 41 chunks, app builds without errors. **Deploy attempt
+  documented failure:** `huggingface_hub.create_repo(repo_type="space")` returns
+  HTTP **402 Payment Required** — Gradio/Docker Spaces on free cpu-basic now
+  require a HF PRO subscription, and this account is on the free tier. The Space
+  is fully packaged and deployable via `scripts/deploy_space.py` (verified
+  dry-run); hosting needs either a PRO subscription or a static Space.
+  Gradio 6.3 note: `gr.Chatbot` no longer accepts `type="messages"` — messages
+  format is the only format.
