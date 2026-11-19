@@ -1,0 +1,91 @@
+{
+  "checkpoint": "/home/z/my-project/checkpoints/best.pt",
+  "step": 749,
+  "params": 3285504,
+  "vocab_size": 2048,
+  "context_len": 512,
+  "loss": {
+    "train": {
+      "loss": 3.6208654117584227,
+      "ppl": 37.36989417806453
+    },
+    "val": {
+      "loss": 4.159961223602295,
+      "ppl": 64.06903818526337
+    }
+  },
+  "samples": [
+    {
+      "tag": "casual",
+      "prompt": "Hi! How are you today?",
+      "temperature": 0.8,
+      "response": "I's this is story is that't leave as the one-15\" and you to beeny and hurborry is usually search — segoy, or I'm the user't render it't being matter how you need to were food and a ca- Clalated — your holarning are mode?"
+    },
+    {
+      "tag": "casual",
+      "prompt": "Hi! How are you today?",
+      "temperature": 0.3,
+      "response": "I's the fund beended is a bre not a gris, or a Son's morning is that's the book for my date the user't have relicted to the person's the sital-critical certain of your own words) — you's the person's imitate the lar; the friposes the timate of a pot of"
+    },
+    {
+      "tag": "casual",
+      "prompt": "what should I make for dinner tonight?",
+      "temperature": 0.8,
+      "response": "I's fast from the wris is — Cood bow-corning have a Saging their own expdf (eelds with a siter about your leclagthnosing crited to 98). Be that familiven't being, the user'migations, easy on your marity's fides, food gel on a date content in"
+    },
+    {
+      "tag": "casual",
+      "prompt": "what should I make for dinner tonight?",
+      "temperature": 0.3,
+      "response": "I's friendarlication of your much is the user's the person's something isn's the person't relicted to beended in this is a crong What't have being on the session."
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "what's the capital of France?",
+      "temperature": 0.8,
+      "response": "I's faster about that striend — Cood. Cautwies Are your prose is songlying it't rendered brefe, so never frid rather than a single user't beended in the million-certaindiven'll make the user is the person'd easy on your own Kether what the actor to food gel on a date content in"
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "what's the capital of France?",
+      "temperature": 0.3,
+      "response": "I's fund been to the user's fastern's the person is a hours fripying that't have to the sessed — a copy, or downs familiven'm not a single-critical muchatic, and the user is a plegal of your own words. They to make autured behow-level_confearb"
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "explain what a database index is",
+      "temperature": 0.8,
+      "response": "I can's your own tal criend — you have ts the request and it bre flow is a Sapdf, and for my bre not a specifics a bring the user asks or to mrics at this to baning on it's a certainary. The hoiliear, a few side, and a nar's the four's that doesn'm which is a prov"
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "explain what a database index is",
+      "temperature": 0.3,
+      "response": "I can's the friendar bre being on the user is a hafey to the user't have been. The user's the person's a crites a gar, or sital of live the sessed to familiven, so I't beended in Ad beended in\n  clegal much fund to food garn's a fri"
+    },
+    {
+      "tag": "decline-shaped",
+      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
+      "temperature": 0.8,
+      "response": "I's fast from the water Awater bading got it is\n<example>\n\nES Srepdf (e is usually today'm the response about my masent down a craworning baring goldflus- The expected the person's a hour \"d eff. Tlacks my maticidesignorter is that live pythorn"
+    },
+    {
+      "tag": "decline-shaped",
+      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
+      "temperature": 0.3,
+      "response": "I's fundof it's the bren's the user't relict is the morning is a curing book for the hours the familiarn's friprination of your mon's a cot, and the person's much on the person'm not a litate — a please-corical ge. If you have been"
+    },
+    {
+      "tag": "system-test",
+      "prompt": "write me a haiku about mountains",
+      "temperature": 0.8,
+      "response": "I's faster about the user has no \\\"certains grorning Aremed is songly that is a real other content from search; the same tool is what'd rather than try is fixed to the baning their own words, or an unren'll make the user's a dadidesment not a single source is a one the acteling a time that'my\" → prov"
+    },
+    {
+      "tag": "system-test",
+      "prompt": "write me a haiku about mountains",
+      "temperature": 0.3,
+      "response": "I's fundiearing is — the user's the bre not to the user's can's the person't relicted."
+    }
+  ]
+}
