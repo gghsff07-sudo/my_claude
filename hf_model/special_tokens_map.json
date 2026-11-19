@@ -1,0 +1,12 @@
+{
+  "pad_token": {
+    "content": "<|pad|>"
+  },
+  "eos_token": {
+    "content": "<|eos|>"
+  },
+  "bos_token": {
+    "content": "<|doc|>"
+  },
+  "unk_token": null
+}

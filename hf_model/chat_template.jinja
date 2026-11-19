@@ -1,0 +1,12 @@
+{%- if messages[0]['role'] == 'system' %}
+<system>{{ messages[0]['content'] }}</system>
+{% set start = 1 %}
+{%- else %}
+{% set start = 0 %}
+{%- endif %}
+{%- for message in messages[start:] %}
+{{ message['role'] | capitalize }}: {{ message['content'] }}
+{% endfor %}
+{%- if add_generation_prompt %}
+Assistant:
+{%- endif %}

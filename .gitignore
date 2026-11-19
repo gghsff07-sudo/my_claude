@@ -7,4 +7,4 @@ __pycache__/
 runs/
 checkpoints/*.pt
 .env
-hf_model/
+hf_model/model.safetensors
