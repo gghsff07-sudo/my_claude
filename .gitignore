@@ -1,2 +1,8 @@
 skills/
 node_modules/
+.gittoken
+*.pyc
+__pycache__/
+.pytest_cache/
+runs/
+checkpoints/*.pt
