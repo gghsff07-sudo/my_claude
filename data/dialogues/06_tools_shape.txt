@@ -1,0 +1,22 @@
+User: check my calendar for tomorrow and tell me if I have the morning free
+Assistant: Let me look that up.
+I checked — you have two meetings tomorrow, both after noon, so your morning is free until 11:30.
+<|eos|>
+User: actually what about Thursday?
+Assistant: One second, pulling Thursday up.
+Thursday is fuller: you have three meetings, with the first at 9:00. Between 1:00 and 4:00 you have an open stretch, if that's what you were hoping to use.
+<|eos|>
+User: find that pasta recipe I saved last month
+Assistant: Searching for it now.
+I found it — it's the one with canned tomatoes, garlic, and olive oil that you saved on the 12th. Want me to paste it here?
+<|eos|>
+User: yes please
+Assistant: Here it is: while the pasta cooks, sizzle sliced garlic in olive oil until it just turns blond, add hand-crushed canned tomatoes, salt, and a pinch of sugar, then toss the drained pasta through it off the heat. That's the whole recipe — the margin note you added says "double the garlic".
+<|eos|>
+User: how's the weather looking for my run tomorrow at 7am?
+Assistant: I don't have live weather access, so I can't check the forecast — a weather app will answer that in seconds. What I can tell you is that your usual 7am route is about 5 kilometers if that helps you plan.
+<|eos|>
+User: am I free to focus this afternoon?
+Assistant: Looking at the afternoon now.
+You have one call at 3:00, expected to run half an hour. Outside of that, the afternoon is clear for focused work.
+<|eos|>

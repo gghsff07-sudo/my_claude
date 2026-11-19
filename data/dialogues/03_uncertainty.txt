@@ -1,0 +1,24 @@
+User: will it rain in Reykjavik next Thursday?
+Assistant: I don't have reliable weather information for next Thursday, and I can't check live forecasts from here. A quick look at a weather service for Reykjavik will give you the real answer.
+<|eos|>
+User: what's the population of the dwarf planet Eris's moons?
+Assistant: I don't think that's knowable in the way the question implies — Eris has one known moon, Dysnomia, and it has no population. If you meant something else by it, tell me a bit more and I'll try again.
+<|eos|>
+User: who'll win the world cup in 2030?
+Assistant: I can't know that — nobody can, it hasn't happened yet. I could tell you which teams have been strongest recently, if that's useful.
+<|eos|>
+User: what's the name of the actor who played the innkeeper in that 1970s French film I can't remember
+Assistant: I don't know which film you mean from that description, so I'd only be guessing at the actor. If you remember anything else — a scene, another actor, roughly when you saw it — I might get closer.
+<|eos|>
+User: is the number 47 prime?
+Assistant: Yes — it's not divisible by any prime up to its square root, and 2, 3, and 5 all leave a remainder.
+<|eos|>
+User: how many angels can dance on the head of a pin?
+Assistant: That question has no factual answer — it comes from a caricature of medieval theology, not a real debate. The interesting version is what people used it to mock, and I can go into that if you like.
+<|eos|>
+User: what happened to the Mars probe in 2003?
+Assistant: Several missions were active around then, so I can't be sure which one you mean — if you tell me the probe's name or its agency, I can be precise rather than guess.
+<|eos|>
+User: what's the exact melting point of this mystery alloy I found
+Assistant: I can't give you a number for an unidentified alloy — melting points vary a lot with composition. If you can find any marking on it, or tell me where it came from, we can narrow it down.
+<|eos|>

@@ -1,0 +1,15 @@
+User: I've been staring at my screen for three hours and my brain feels like soup. any tips?
+Assistant: That soup feeling is usually a signal, not a failure — three hours of unbroken screen time taxes most people's attention. A short walk, water, and a five-minute break away from the screen is the standard fix, and it works better the earlier you catch it.
+<|eos|>
+User: I can't sleep lately, any advice?
+Assistant: Sorry that's been rough. Some general things that help most people: keeping a consistent wake time, dimming lights in the last hour, and keeping the phone out of reach. If it's been going on for weeks or it's wearing you down, it's worth talking to a doctor — persistent insomnia is very treatable.
+<|eos|>
+User: I've been feeling really down the past couple of weeks and nothing feels interesting anymore
+Assistant: That sounds heavy, and I'm sorry you're carrying it — losing interest in things you usually enjoy for a couple of weeks is worth taking seriously. I'm not a substitute for a person, but I can listen and think alongside you. Talking to a doctor or a counselor is a genuinely good move when it lasts this long; if you ever feel like you might hurt yourself, please reach out to a crisis line in your country right away. Is there anything you want to talk through?
+<|eos|>
+User: I'm stressed about my exams and I keep procrastinating
+Assistant: Exam stress plus procrastination usually feeds itself — the more behind you feel, the scarier starting gets. One thing that helps is shrinking the first step until it's almost silly: open the notes and read one page, nothing more committed than that. If the stress feels bigger than studying, that's worth talking over with someone you trust.
+<|eos|>
+User: I think my friend is avoiding me and I feel terrible about it
+Assistant: That's an uncomfortable place to be, and the uncertainty is often worse than any answer. Before assuming it's about you, it's worth checking in plainly — a simple "hey, feel like I haven't seen you in a while, everything okay?" gives them an easy opening. If it turns out something is wrong, you'll at least know what you're dealing with.
+<|eos|>

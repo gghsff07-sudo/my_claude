@@ -1,0 +1,24 @@
+User: I need to plan a 3-day trip to Kyoto in autumn
+Assistant: Autumn in Kyoto — good choice, the maples peak around late November. A workable shape: day one for the east side, with Kiyomizu-dera early before crowds, then the lanes below it; day two for the north-west, starting at Kinkaku-ji and ending with the bamboo path at Arashiyama; day three loose, with Nishiki Market and any temple you fell in love with. Two honest tips: book accommodation now, and expect crowds at the famous spots no matter how you plan.
+<|eos|>
+User: what should I pack for it?
+Assistant: Layers — days are mild, temple grounds turn cold and damp fast, and evenings are properly chilly. Comfortable shoes for stone paths and hills, a small towel, and a coin purse for shrine offerings and vending machines. Leave room in the bag; you'll come back with things.
+<|eos|>
+User: how should I split a month between Lisbon and Porto?
+Assistant: The common verdict is more time in Lisbon, since it has more layers — a workable split is 18/12 or 20/10. Base in Lisbon with a couple of day trips, then slow down in Porto, where a week is enough for the city itself plus the Douro valley. If you prefer one base and quiet over variety, flip the split and stay in Porto for most of it.
+<|eos|>
+User: any tips for a first long-haul flight with a toddler?
+Assistant: The honest ones: pick a flight that matches their sleep window rather than fighting it, gate-check the stroller, and bring more snacks than seems rational — snacks solve more in-flight problems than toys do. A familiar blanket and one new small surprise per hour buys calm. And lower the bar: arriving with everyone alive and only mildly wrecked is a successful flight.
+<|eos|>
+User: I want to start running, how do I begin?
+Assistant: Start embarrassingly easy — alternate one minute of running with two of walking, twenty minutes total, three times a week — and add minutes only when the current week feels routine. Most beginners quit from doing too much in week one, not from lack of willpower. One decent pair of shoes is the only equipment that matters.
+<|eos|>
+User: teach me one sentence I can use in every country
+Assistant: "Thank you" in the local language, learned on day one — it's the one phrase that improves every interaction everywhere. "Excuse me, do you speak English?" is the second. Between those two, you can be polite and find help in most places on earth.
+<|eos|>
+User: I have guests coming in an hour and my apartment is a disaster
+Assistant: Triage, not cleaning: walk in with a trash bag and clear surfaces first, then the bathroom — those two are what guests actually see and touch. Close bedroom doors, put dishes in the oven if you have to, open a window, and put on music. Nobody has ever inspected under a sofa at a casual visit.
+<|eos|>
+User: what's something kind I can do for my neighbor?
+Assistant: The low-effort, high-impact one: bring their bins in from the curb on collection day. It requires no interaction, costs you a minute, and people remember it for years. If you want something warmer, next time you bake or order too much food, bring some over with no expectation of conversation.
+<|eos|>
