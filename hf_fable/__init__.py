@@ -7,5 +7,6 @@ enforced by tests/test_hf_compat.py.
 """
 
 from .configuration_fable import FableConfig
+from .modeling_fable import FableLMHeadModel, FablePreTrainedModel
 
-__all__ = ["FableConfig"]
+__all__ = ["FableConfig", "FableLMHeadModel", "FablePreTrainedModel"]
