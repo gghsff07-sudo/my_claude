@@ -154,3 +154,25 @@ byte-level vocab covers every byte, so an unk token is unnecessary by design (sa
 3. `AutoModelForCausalLM.from_pretrained("hf_model/")` and `.generate(...)` work with the required
    sampling controls; tokenizer round-trips; `apply_chat_template` produces the training format.
 4. Hub upload (or dry run) via `push_to_hub.py`; Space runs locally with `gradio app.py`.
+
+## 5. Results log (appended per step)
+
+- **Step 3 (modeling)** — parity gate PASSED: shipped checkpoint loads into
+  `FableLMHeadModel` with zero renames; logits bit-identical to `fable_lm.FableLM`
+  (max |Δ| = 0.0, fp32). Two transformers-5.23 specifics discovered and handled:
+  (a) `_tied_weights_keys` is now a `{target: source}` dict, not a list;
+  (b) transformers re-exports its own `nn.init.normal_` (with a `generator` kwarg) whose
+  call stream differs from torch's — `hf_fable` binds torch's originals, so same-seed
+  construction matches `fable_lm` exactly (verified: all 45 tensors equal at seed 0).
+- **Step 4 (conversion)** — `scripts/convert_to_hf.py` converts
+  `checkpoints/best.pt` (step 749, best_val 4.1600) → `hf_model/`:
+  `config.json` (auto_map: AutoConfig/AutoModelForCausalLM), `model.safetensors`
+  (44 tensors, 13.15 MB fp32; tied `head.weight` dropped, re-tied on load),
+  `generation_config.json` (t=0.8, top_p=0.9, top_k=50, rep_pen=1.2, max_new=128),
+  and self-contained `configuration_fable.py`/`modeling_fable.py` copies.
+  Parity verified through the REAL loading path
+  (`AutoModelForCausalLM.from_pretrained(..., trust_remote_code=True)` on the saved
+  folder): **max |Δlogits| = 0.0** on B=2, T∈{7,33,128,512} — far under the 1e-4 bar.
+  Import style for remote code confirmed empirically: snapshot-root files with a
+  relative import (`from .configuration_fable import ...`) load fine via
+  `spec_from_file_location`; transformers detects and copies the dependency.
