@@ -19,22 +19,13 @@ repo. Everything here is built for: 2 CPUs, 4 GB RAM, PyTorch 2.15.0+cpu.
 | Context length | 512 tokens (A5) | Corpus documents are chunked to this; longer is pure cost here |
 | Attention window | Full causal within 512 | 512² attention is cheap enough on CPU |
 
-Default config gives **~3.9M parameters** (see table below; the model prints its own
-exact count at init and EVAL.md records it).
+### Parameter budget
 
-### Parameter budget (default config, vocab 2048, d_model 256)
-
-| Piece | Params |
-| --- | --- |
-| Token embedding 2048×256 | 524,288 |
-| Position embedding 512×256 | 131,072 |
-| Per block: LN×2 (512) + QKVO (4×65,792) + FF (2×262,144 + LN) | 1,184,896 |
-| 6 blocks | 7,109,376 — *over budget* |
-
-Because 6×1024-wide FF blocks land above the "few million" target, the shipped
-default is **4 layers, d_model 256, d_ff 768** → ≈ **2.9M params** (computed
-exactly by the model at init; the number in EVAL.md is the source of truth). The
-6-layer variant stays available via config for a heavier run.
+An early 6-layer sketch landed at ~7.1M — above the "few million" target — so the
+shipped default is **4 layers, d_model 256, d_ff 768 (vocab 2048, ctx 512)** →
+exactly **3,285,504 params** (`ModelConfig.param_count()`, verified against the
+live model in `tests/test_model.py`). The 6-layer variant stays available via
+config for a heavier run.
 
 ## 2. Trait → implementation map (from STUDY.md)
 
