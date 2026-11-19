@@ -176,3 +176,21 @@ byte-level vocab covers every byte, so an unk token is unnecessary by design (sa
   Import style for remote code confirmed empirically: snapshot-root files with a
   relative import (`from .configuration_fable import ...`) load fine via
   `spec_from_file_location`; transformers detects and copies the dependency.
+- **Step 5 (tokenizer)** — `scripts/convert_tokenizer_to_hf.py` builds a
+  `PreTrainedTokenizerFast` in `hf_model/`: `tokenizer.json` (123.6 KB),
+  `tokenizer_config.json`, `special_tokens_map.json` (emitted explicitly — 5.x
+  stopped writing it by default, older transformers still read it),
+  `chat_template.jinja`. Key technique: the repo's byte→char bijection differs
+  from GPT-2's only for bytes 127–160/173, so the vocab+merges were RE-EXPRESSED
+  in GPT-2 char space (same bytes, same ids, same merge ranks) enabling the
+  standard `tokenizers` `ByteLevel` pre-tokenizer/decoder with
+  `Split(regex " ?\w+| ?[^\w\s]+|\s+")` reproducing the repo's stdlib-re
+  pre-tokenizer. Verification: **40/40 corpus texts (all dialogues, docs,
+  research + adversarial edges incl. emoji/CJK/control bytes) encode to
+  IDENTICAL ids** as `ByteBPETokenizer`; 300-sample byte-fuzz round-trip
+  lossless; specials keep ids 256/257/258 (pad/eos/bos, bos=`<|doc|>` re-purposed,
+  unk=None); chat template renders exactly `build_prompt_tokens`+`cue_tokens`
+  (verified for 4 message shapes, both tokenize=True/False). The tokenizer needs
+  NO remote code — `AutoTokenizer.from_pretrained` loads it as `TokenizersBackend`.
+  Note (5.x): `apply_chat_template(tokenize=True)` returns a `BatchEncoding`
+  (`input_ids`/`attention_mask`), not a bare id list.
