@@ -38,6 +38,11 @@ held-out split) — see EVAL.md's run3 section for why that is an improvement.
   the sampling test asserted an exact length although a sampled EOS can end
   generation early. Both passed on run2's weights by luck and failed on
   run3's; they now pin the generation parameters explicitly.
+- **Shipped-artifact bloat** (`scripts/to_fp16.py`): v0.2.0 added optimizer
+  state to every checkpoint, but the fp16 shipper only converted the model
+  weights — the fp32 AdamW moments rode along and the shipped model grew from
+  7.6 MB to 34 MB. The optimizer state is now dropped; run3's shipped model
+  is 7.6 MB again.
 
 ### Changed
 
