@@ -19,7 +19,7 @@ top_k, max_new_tokens and repetition_penalty through GenerationMixin.
 from __future__ import annotations
 
 import math
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -28,14 +28,14 @@ from transformers import GenerationMixin, PreTrainedModel
 from transformers.cache_utils import Cache, DynamicCache
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
+from .configuration_fable import FableConfig
+
 # transformers re-exports its own nn.init wrappers (they take a `generator`
 # kwarg and advance the global RNG differently when it is explicitly None).
 # Importing torch's originals by module path guarantees the same init draws
 # as fable_lm.model.FableLM, so same-seed constructors are bit-identical.
 _nn_init_normal = torch.nn.init.normal_
 _nn_init_zeros = torch.nn.init.zeros_
-
-from .configuration_fable import FableConfig
 
 
 class CausalSelfAttention(nn.Module):
@@ -229,7 +229,9 @@ class FableLMHeadModel(FablePreTrainedModel, GenerationMixin):
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
             loss = F.cross_entropy(
-                shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1), ignore_index=-100
+                shift_logits.view(-1, shift_logits.size(-1)),
+                shift_labels.view(-1),
+                ignore_index=-100,
             )
 
         return CausalLMOutputWithPast(

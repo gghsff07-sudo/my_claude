@@ -1,6 +1,6 @@
 import pytest
 
-from fable_lm.tokenizer import SPECIALS, SPECIAL_IDS, ByteBPETokenizer
+from fable_lm.tokenizer import SPECIAL_IDS, SPECIALS, ByteBPETokenizer
 
 TRAIN_TEXTS = [
     "User: Hello!\nAssistant: Hi there. How can I help you today?\n",
@@ -72,6 +72,8 @@ def test_save_load_roundtrip(tmp_path, tok):
 
 
 def test_train_grows_vocab_deterministically():
-    a = ByteBPETokenizer(); a.train(TRAIN_TEXTS, 300)
-    b = ByteBPETokenizer(); b.train(TRAIN_TEXTS, 300)
+    a = ByteBPETokenizer()
+    a.train(TRAIN_TEXTS, 300)
+    b = ByteBPETokenizer()
+    b.train(TRAIN_TEXTS, 300)
     assert a.merges == b.merges

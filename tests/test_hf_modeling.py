@@ -42,7 +42,8 @@ def make_pair(seed=0):
     hf = FableLMHeadModel(tiny_hf_cfg())
     torch.manual_seed(seed)
     orig = FableLM(tiny_repo_cfg())
-    hf.eval(); orig.eval()
+    hf.eval()
+    orig.eval()
     return hf, orig
 
 

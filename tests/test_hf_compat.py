@@ -31,7 +31,8 @@ CKPT = REPO / "checkpoints" / "best.pt"
 
 pytestmark = pytest.mark.skipif(
     not (HF_DIR / "model.safetensors").is_file() or not CKPT.is_file(),
-    reason="hf_model/ not built — run scripts/convert_to_hf.py and scripts/convert_tokenizer_to_hf.py",
+    reason="hf_model/ not built — run scripts/convert_to_hf.py "
+           "and scripts/convert_tokenizer_to_hf.py",
 )
 
 

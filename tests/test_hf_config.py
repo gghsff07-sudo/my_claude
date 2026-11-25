@@ -5,10 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from fable_lm.model import ModelConfig
-
 from hf_fable import FableConfig
 
 REPO = Path(__file__).resolve().parents[1]
@@ -34,7 +31,8 @@ def test_config_defaults_match_repo_default():
 
 def test_config_roundtrip_with_model_config():
     """FableConfig <-> fable_lm.ModelConfig convert losslessly both ways."""
-    repo_cfg = ModelConfig(vocab_size=1111, context_len=64, n_layers=2, d_model=32, n_heads=2, d_ff=64)
+    repo_cfg = ModelConfig(vocab_size=1111, context_len=64, n_layers=2,
+                           d_model=32, n_heads=2, d_ff=64)
     hf = FableConfig(
         vocab_size=repo_cfg.vocab_size,
         max_position_embeddings=repo_cfg.context_len,

@@ -5,7 +5,9 @@ Usage:
 
 Includes: AdamW with weight decay on matrix params, linear warmup + cosine
 decay to 10% of peak, global-norm gradient clipping, periodic and best
-checkpoints, CSV + stdout logging, and early stopping on val loss.
+checkpoints (model + optimizer state, so --resume continues training rather
+than restarting the optimizer), CSV + stdout logging, and early stopping on
+val loss.
 """
 
 from __future__ import annotations
@@ -18,10 +20,9 @@ from dataclasses import asdict
 from pathlib import Path
 
 import torch
-import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
-from fable_lm.data import build_token_stream, load_documents, split_documents
+from fable_lm.data import build_token_stream, is_dialogue, load_documents, split_docs
 from fable_lm.model import FableLM, ModelConfig
 from fable_lm.tokenizer import SPECIAL_IDS, ByteBPETokenizer
 
@@ -69,6 +70,29 @@ def evaluate(model: FableLM, loader: DataLoader, device: torch.device) -> float:
     return losses / max(1, n)
 
 
+def save_ckpt(
+    path: Path,
+    model: FableLM,
+    opt: torch.optim.Optimizer,
+    cfg: ModelConfig,
+    step: int,
+    best_val: float,
+    tok_path: Path,
+) -> None:
+    """One checkpoint format for best/step/final: model, optimizer state, config."""
+    torch.save(
+        {
+            "model": model.state_dict(),
+            "opt": opt.state_dict(),
+            "cfg": asdict(cfg),
+            "step": step,
+            "best_val": best_val,
+            "tokenizer": str(tok_path),
+        },
+        path,
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Train the Fable miniature")
     ap.add_argument("--steps", type=int, default=600)
@@ -80,7 +104,8 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--val-every", type=int, default=50)
     ap.add_argument("--ckpt-every", type=int, default=200)
-    ap.add_argument("--patience", type=int, default=5, help="early stop after N vals w/o improvement")
+    ap.add_argument("--patience", type=int, default=5,
+                    help="early stop after N vals w/o improvement")
     ap.add_argument("--run-name", type=str, default="run1")
     ap.add_argument("--vocab-size", type=int, default=2048)
     ap.add_argument("--data-mult", type=int, default=1, help="repeat corpus N times (more windows)")
@@ -97,10 +122,13 @@ def main() -> None:
     docs = load_documents()
     if not docs:
         raise SystemExit("No corpus documents found — run from the repo root.")
-    train_texts, val_texts = split_documents(docs)
+    train_docs, val_docs = split_docs(docs)
+    train_texts = [t for _, t in train_docs]
+    val_texts = [t for _, t in val_docs]
     if args.dialogue_mult > 1:
-        # upweight chat-format data: repeat the short dialogue docs only
-        extra = [t for n, t in docs if n[:2].isdigit()]
+        # upweight chat-format data: repeat dialogue docs from the TRAIN split
+        # only — val must stay fully held-out (no copies of val docs in train)
+        extra = [t for n, t in train_docs if is_dialogue(n)]
         train_texts = train_texts + extra * (args.dialogue_mult - 1)
     print(f"corpus: {len(docs)} documents ({len(train_texts)} train / {len(val_texts)} val texts)")
 
@@ -130,13 +158,7 @@ def main() -> None:
     model = FableLM(cfg).to(device)
     print(f"model: {model.num_params():,} params ({cfg.n_layers}L x d{cfg.d_model} x ff{cfg.d_ff})")
 
-    start_step, best_val = 0, float("inf")
-    if args.resume:
-        ck = torch.load(args.resume, map_location=device)
-        model.load_state_dict(ck["model"])
-        start_step, best_val = ck["step"] + 1, ck.get("best_val", float("inf"))
-        print(f"resumed from {args.resume} at step {start_step}")
-
+    # ---------- optimizer (before resume: the moments are restored into it) ----------
     decay, no_decay = [], []
     for name, p in model.named_parameters():
         if not p.requires_grad:
@@ -151,16 +173,27 @@ def main() -> None:
         betas=(0.9, 0.95),
     )
 
+    start_step, best_val = 0, float("inf")
+    if args.resume:
+        ck = torch.load(args.resume, map_location=device, weights_only=True)
+        model.load_state_dict(ck["model"])
+        start_step, best_val = ck["step"] + 1, ck.get("best_val", float("inf"))
+        if ck.get("opt"):
+            opt.load_state_dict(ck["opt"])  # AdamW moments survive a resume
+        print(f"resumed from {args.resume} at step {start_step} "
+              f"(optimizer state {'restored' if ck.get('opt') else 'reset'})")
+
     run_dir = REPO / "runs" / args.run_name
     run_dir.mkdir(parents=True, exist_ok=True)
     ckpt_dir = REPO / "checkpoints"
     ckpt_dir.mkdir(exist_ok=True)
     log_path = run_dir / "log.csv"
-    new_log = not log_path.exists() and not args.resume
+    new_log = not log_path.exists()
     log_f = open(log_path, "a", newline="")
     logger = csv.writer(log_f)
     if new_log:
-        logger.writerow(["step", "lr", "train_loss", "val_loss", "val_ppl", "tokens_per_s", "elapsed_s"])
+        logger.writerow(["step", "lr", "train_loss", "val_loss", "val_ppl",
+                         "tokens_per_s", "elapsed_s"])
 
     # ---------- loop ----------
     print(f"training {args.steps} steps: lr {args.lr}, warmup {args.warmup}, clip {args.clip}")
@@ -199,11 +232,7 @@ def main() -> None:
             star = ""
             if val_loss < best_val:
                 best_val, bad_vals, star = val_loss, 0, " *best*"
-                torch.save(
-                    {"model": model.state_dict(), "cfg": asdict(cfg), "step": step,
-                     "best_val": best_val, "tokenizer": str(tok_path)},
-                    ckpt_dir / "best.pt",
-                )
+                save_ckpt(ckpt_dir / "best.pt", model, opt, cfg, step, best_val, tok_path)
             else:
                 bad_vals += 1
             print(f"step {step+1:5d} | lr {lr:.2e} | train {loss.item():.4f} | "
@@ -215,17 +244,10 @@ def main() -> None:
         step += 1
 
         if (step + 1) % args.ckpt_every == 0:
-            torch.save(
-                {"model": model.state_dict(), "cfg": asdict(cfg), "step": step,
-                 "best_val": best_val, "tokenizer": str(tok_path)},
-                ckpt_dir / f"step{step+1:06d}.pt",
-            )
+            save_ckpt(ckpt_dir / f"step{step+1:06d}.pt", model, opt, cfg,
+                      step, best_val, tok_path)
 
-    torch.save(
-        {"model": model.state_dict(), "cfg": asdict(cfg), "step": step,
-         "best_val": best_val, "tokenizer": str(tok_path)},
-        ckpt_dir / "final.pt",
-    )
+    save_ckpt(ckpt_dir / "final.pt", model, opt, cfg, step, best_val, tok_path)
     log_f.close()
     print(f"done: best val loss {best_val:.4f} (ppl {math.exp(min(20, best_val)):.2f}); "
           f"checkpoints in {ckpt_dir}; log {log_path}")

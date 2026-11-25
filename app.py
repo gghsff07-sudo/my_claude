@@ -7,6 +7,10 @@ Usage:
     python app.py                                  # Hub model (dev-sandakelum/fable-mini)
     python app.py --model hf_model                 # local converted folder
     MODEL=dev-sandakelum/fable-mini python app.py  # env override
+
+--model is parsed before the model loads (the original parsed it after, so
+the flag never reached the loader); unknown extra arguments, e.g. the ones a
+Space injects, are ignored.
 """
 
 from __future__ import annotations
@@ -16,11 +20,19 @@ import os
 import threading
 
 import gradio as gr
-import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 
-DEFAULT_MODEL = os.environ.get("MODEL", "dev-sandakelum/fable-mini")
+from fable_lm.demo_utils import clean, messages_from_history
+
 TRUST_REMOTE_CODE = True  # custom architecture (configuration_fable/modeling_fable)
+
+# early, tolerant parse: only what the load needs; everything else (e.g. -h)
+# falls through to the full parser in __main__
+_early = argparse.ArgumentParser(add_help=False)
+_early.add_argument("--model", default=None)
+_early_args, _ = _early.parse_known_args()
+
+DEFAULT_MODEL = _early_args.model or os.environ.get("MODEL", "dev-sandakelum/fable-mini")
 
 print(f"loading {DEFAULT_MODEL} ...")
 tok = AutoTokenizer.from_pretrained(DEFAULT_MODEL, trust_remote_code=TRUST_REMOTE_CODE)
@@ -35,21 +47,10 @@ SYSTEM_DEFAULT = (
 )
 
 
-def clean(text: str) -> str:
-    """Strip specials and any hallucinated next turn, as in fable_lm.chat."""
-    for marker in ("<|eos|>", "<|doc|>", "<|pad|>"):
-        text = text.replace(marker, "")
-    return text.split("User:")[0].strip()
-
-
 def respond(message, history, system, temperature, top_p, max_new_tokens):
-    messages = []
-    if system:
-        messages.append({"role": "system", "content": system})
-    for user_msg, assistant_msg in history:
-        messages.append({"role": "user", "content": user_msg})
-        messages.append({"role": "assistant", "content": assistant_msg})
-    messages.append({"role": "user", "content": message})
+    # history: gradio 6 messages format (dicts); the pending user turn is
+    # `message` and is appended once — multi-turn context now survives
+    messages = messages_from_history(system, history, message)
 
     enc = tok.apply_chat_template(
         messages, tokenize=True, add_generation_prompt=True,
@@ -111,7 +112,7 @@ with gr.Blocks(title=DEMO_TITLE) as demo:
     def bot_turn(chat, system, temperature, top_p, max_new_tokens):
         # gradio sends the full log; entries alternate user/assistant, the
         # last entry is the pending user turn
-        history = [(m["role"], m["content"]) for m in chat[:-1]]
+        history = [dict(m) for m in chat[:-1]]
         reply = respond(chat[-1]["content"], history, system, temperature, top_p, max_new_tokens)
         chat = chat + [{"role": "assistant", "content": ""}]
         for chunk in reply:

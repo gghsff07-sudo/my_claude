@@ -19,7 +19,9 @@ from pathlib import Path
 # stdlib re: \w covers [A-Za-z0-9_] plus unicode letters/digits — enough here,
 # and deterministic. Leading-space capture keeps " word" merges natural.
 _PRETOK = re.compile(r" ?\w+| ?[^\w\s]+|\s+")
-_SPECIAL_SPLIT = re.compile("(" + "|".join(re.escape(s) for s in ["<|pad|>", "<|eos|>", "<|doc|>"]) + ")")
+_SPECIAL_SPLIT = re.compile(
+    "(" + "|".join(re.escape(s) for s in ["<|pad|>", "<|eos|>", "<|doc|>"]) + ")"
+)
 
 SPECIALS = ["<|pad|>", "<|eos|>", "<|doc|>"]
 BYTE_IDS = 256  # ids 0..255 are the raw bytes
@@ -93,12 +95,12 @@ class ByteBPETokenizer:
         target_merges = vocab_size - BYTE_IDS - len(SPECIALS)
         merges: list[tuple[str, str]] = []
         while len(merges) < target_merges:
-            # best = most frequent pair; deterministic tie-break on pair itself
-            best, best_cnt = None, 0
-            for p, c in pair_counts.items():
-                if c > best_cnt or (c == best_cnt and c > 0 and best is not None and p > best):
-                    best, best_cnt = p, c
-            if best is None or best_cnt < 2:
+            # best = most frequent pair; deterministic tie-break on the pair
+            # itself (greatest pair wins, as before, but via one C-level max)
+            if not pair_counts:
+                break
+            best, best_cnt = max(pair_counts.items(), key=lambda kv: (kv[1], kv[0]))
+            if best_cnt < 2:
                 break  # no pair occurs twice — no signal left
             merges.append(best)
 

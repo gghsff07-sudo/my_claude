@@ -52,7 +52,9 @@ def test_decode_parity_on_corpus(repo_tok, fast):
 
 def test_special_tokens_encode_to_exact_ids(repo_tok, fast):
     for s in SPECIALS:
-        assert fast.encode(s, add_special_tokens=False) == [repo_tok.encode(s)[0]] == [SPECIALS.index(s) + 256]
+        repo_id = repo_tok.encode(s)[0]
+        got = fast.encode(s, add_special_tokens=False)
+        assert got == [repo_id] == [SPECIALS.index(s) + 256]
     assert fast.decode([256, 257, 258]) == "<|pad|><|eos|><|doc|>"
     # specials inside text are never split or merged through
     text = "before <|eos|> after"

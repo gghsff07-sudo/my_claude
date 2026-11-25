@@ -61,7 +61,8 @@ def test_context_crop():
 
 def test_prompt_assembly_and_extraction():
     tok, _ = _tok_model()
-    ids = build_prompt_tokens(tok, "be brief", [("user", "hi"), ("assistant", "hello!")], "how are you?")
+    ids = build_prompt_tokens(
+        tok, "be brief", [("user", "hi"), ("assistant", "hello!")], "how are you?")
     text = tok.decode(ids)
     assert text == "<system>be brief</system>\nUser: hi\nAssistant: hello!\nUser: how are you?\n"
     assert tok.decode(cue_tokens(tok)) == "Assistant:"

@@ -1,9 +1,11 @@
 """Build notebooks/fable_mini_colab.ipynb — a Colab notebook that loads
 fable-mini through transformers, and verify its code cells actually run."""
 
-import json
-import nbformat
+import subprocess
+import sys
 from pathlib import Path
+
+import nbformat
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -130,8 +132,6 @@ print("wrote", out_path)
 
 # validate + execute the code cells cumulatively (as a notebook kernel would),
 # skipping repo-dependent and pip cells
-import subprocess, sys
-
 cumulative = ""
 for i, cell in enumerate(nb.cells):
     if cell.cell_type != "code":

@@ -28,7 +28,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from fable_lm.tokenizer import SPECIALS, ByteBPETokenizer, _pretokenize  # noqa: E402
+from fable_lm.tokenizer import SPECIALS, ByteBPETokenizer  # noqa: E402
+
 
 # --- GPT-2's byte -> unicode-char table (same as tokenizers' ByteLevel) ---
 def gpt2_bytes_to_unicode() -> dict[int, str]:
@@ -175,7 +176,8 @@ def verify_chat_template(fast, repo_tok) -> None:
         # build_prompt_tokens: system + all but the final user turn as history
         if gen:
             final_user = rest[-1]["content"]
-            expected_ids = build_prompt_tokens(repo_tok, system, history, final_user) + cue_tokens(repo_tok)
+            expected_ids = (build_prompt_tokens(repo_tok, system, history, final_user)
+                            + cue_tokens(repo_tok))
         else:
             expected_ids = build_prompt_tokens(repo_tok, system, history, None)
         expected = repo_tok.decode(expected_ids)
@@ -183,7 +185,8 @@ def verify_chat_template(fast, repo_tok) -> None:
         got_ids = fast.encode(rendered, add_special_tokens=False)
         if got_ids != expected_ids:
             ok = False
-            print(f"  CHAT TEMPLATE MISMATCH:\n   got:      {rendered!r}\n   expected: {expected!r}")
+            print(f"  CHAT TEMPLATE MISMATCH:\n   got:      {rendered!r}\n"
+                  f"   expected: {expected!r}")
         # tokenized path must equal the text path (5.x returns a BatchEncoding
         # with input_ids/attention_mask, not a bare list)
         tok_out = fast.apply_chat_template(msgs, tokenize=True, add_generation_prompt=gen)
@@ -228,9 +231,10 @@ def main() -> None:
         # and the hub-standard layout expects it.
         special_map = {"pad_token": "<|pad|>", "eos_token": "<|eos|>",
                        "bos_token": "<|doc|>", "unk_token": None}
+        entries = {k: {"content": v} if v is not None else None
+                   for k, v in special_map.items()}
         (out / "special_tokens_map.json").write_text(
-            json.dumps({k: {"content": v} if v is not None else None for k, v in special_map.items()},
-                       indent=2, ensure_ascii=False) + "\n")
+            json.dumps(entries, indent=2, ensure_ascii=False) + "\n")
         print(f"saved -> {out}/")
         for p in sorted(out.iterdir()):
             if p.suffix in (".json", ".jinja") or "token" in p.name:

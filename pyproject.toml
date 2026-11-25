@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fable-lm"
+version = "0.2.0"
+description = "A miniature Fable-5.2-style language model: byte-BPE tokenizer, decoder-only transformer, training loop, chat CLI — all from scratch, plus a Hugging Face wrapper."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "gghsff07-sudo" }]
+keywords = ["language-model", "transformer", "bpe", "educational", "from-scratch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0",
+]
+
+[project.optional-dependencies]
+hf = [
+    "transformers==5.23.0",
+    "safetensors==0.8.0",
+    "tokenizers",
+    "huggingface_hub==2.4.0",
+]
+demo = ["gradio==6.3.0"]
+dev = ["pytest>=8", "ruff"]
+
+[project.scripts]
+fable-train = "fable_lm.train:main"
+fable-chat = "fable_lm.chat:main"
+fable-eval = "fable_lm.eval:main"
+
+[project.urls]
+Repository = "https://github.com/gghsff07-sudo/my_claude"
+Model = "https://huggingface.co/dev-sandakelum/fable-mini"
+
+[tool.setuptools]
+packages = ["fable_lm", "hf_fable"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = ["hf_model", "notebooks", "download", "space"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# long lines there are inside the notebook-cell string literals; reflowing
+# them would change the generated notebook
+"scripts/build_colab_notebook.py" = ["E501"]

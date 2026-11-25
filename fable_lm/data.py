@@ -39,20 +39,37 @@ def load_documents() -> list[tuple[str, str]]:
     return docs
 
 
-def split_documents(
+def is_dialogue(name: str) -> bool:
+    """True for the synthetic dialogue docs (data/dialogues/NN_*.txt)."""
+    return name[:2].isdigit()
+
+
+def split_docs(
     docs: list[tuple[str, str]], val_frac: float = 0.1, seed: int = 42
-) -> tuple[list[str], list[str]]:
-    """Document-level split. Dialogues are small and numerous, so a seeded
-    shuffle at the document level gives both sides a fair mix of genres."""
-    names = [n for n, _ in docs]
+) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    """Document-level split keeping names: (train_docs, val_docs).
+
+    Dialogues are small and numerous, so a seeded shuffle at the document
+    level gives both sides a fair mix of genres. Callers that upweight
+    dialogue data must draw the extra copies from the TRAIN side only, so
+    val stays held-out.
+    """
     rng = random.Random(seed)
     idx = list(range(len(docs)))
     rng.shuffle(idx)
     n_val = max(1, int(len(docs) * val_frac)) if len(docs) > 1 else 0
     val_idx = set(idx[:n_val])
-    train = [t for i, (_, t) in enumerate(docs) if i not in val_idx]
-    val = [t for i, (_, t) in enumerate(docs) if i in val_idx]
+    train = [d for i, d in enumerate(docs) if i not in val_idx]
+    val = [d for i, d in enumerate(docs) if i in val_idx]
     return train, val
+
+
+def split_documents(
+    docs: list[tuple[str, str]], val_frac: float = 0.1, seed: int = 42
+) -> tuple[list[str], list[str]]:
+    """split_docs without the names (backward-compatible text-only view)."""
+    train_docs, val_docs = split_docs(docs, val_frac, seed)
+    return [t for _, t in train_docs], [t for _, t in val_docs]
 
 
 def build_token_stream(

@@ -19,7 +19,6 @@ Max |delta logits| must be < 1e-4 (fp32 is expected to be exactly 0.0).
 from __future__ import annotations
 
 import argparse
-import json
 import shutil
 import sys
 from pathlib import Path
@@ -129,7 +128,8 @@ def verify_parity(checkpoint: Path, out_dir: Path, n_samples: int = 4) -> float:
         d = (lo - lh).abs().max().item()
         max_diff = max(max_diff, d)
         print(f"  parity sample {i + 1}/{n_samples} (B=2, T={T}): max |dlogits| = {d:.3e}")
-    print(f"MAX |dlogits| = {max_diff:.3e}  (require < 1e-4: {'PASS' if max_diff < 1e-4 else 'FAIL'})")
+    verdict = "PASS" if max_diff < 1e-4 else "FAIL"
+    print(f"MAX |dlogits| = {max_diff:.3e}  (require < 1e-4: {verdict})")
     if max_diff >= 1e-4:
         raise SystemExit("parity check FAILED")
     return max_diff

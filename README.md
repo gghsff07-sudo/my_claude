@@ -21,20 +21,25 @@ model's honest capability summary.
 | Evaluation (loss, perplexity, samples) | `fable_lm/eval.py` → `EVAL.md` |
 | Synthetic Fable-style dialogues (training data) | `data/dialogues/` |
 | Shipped checkpoint (fp16, ~7.6 MB) | `models/fable-mini-final.pt` |
-| Tests (53: tokenizer, model, data, training, generation, HF compat) | `tests/` |
+| Tests (76: tokenizer, model, data, training, generation, KV cache, chat commands, demo utils, HF compat) | `tests/` |
 | HF wrapper (config, modeling — self-contained remote code) | `hf_fable/` |
 | HF conversion scripts (weights, tokenizer, upload, Space) | `scripts/` |
 | HF-format model folder (Hub artifact) | `hf_model/` (weights gitignored) |
 | HF audit + per-step results log | `HF_NOTES.md` |
 | Gradio demo (Hub id or local path, streaming) | `app.py` + `space/README.md` |
 | Colab notebook (load via transformers) | `notebooks/fable_mini_colab.ipynb` |
+| Packaging (entry points, extras), license, CI, changelog | `pyproject.toml`, `LICENSE`, `.github/`, `CHANGELOG.md`, `Makefile` |
 
 ## Setup
 
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-python -m pytest tests/ -q        # 53 tests (24 original + 29 HF compat)
+python -m pip install -e ".[hf,dev]"   # or: make setup
+python -m pytest tests/ -q             # 76 tests (53 original + 23 in the v0.2.0 upgrade)
 ```
+
+Installing is optional (everything also runs as `python -m fable_lm.*` from the
+repo root) but gives the `fable-train` / `fable-chat` / `fable-eval` commands.
 
 Python 3.12, PyTorch 2.15.0+cpu. The HF side additionally needs
 `transformers==5.23.0`, `safetensors`, `tokenizers` (see `requirements.txt`).
@@ -48,7 +53,7 @@ python -m fable_lm.train --steps 600 --run-name run1
 # train with the chat data upweighted (the shipped recipe)
 python -m fable_lm.train --steps 800 --run-name run2 --dialogue-mult 6 --data-mult 2
 
-# chat (REPL with /temp, /topp, /system, /reset, /save, /quit)
+# chat (streaming REPL with /temp, /topp, /seed, /system, /reset, /save, /help, /quit)
 python -m fable_lm.chat
 
 # single shot
@@ -60,6 +65,9 @@ python -m fable_lm.eval
 
 The chat CLI loads `checkpoints/best.pt` by default; `--checkpoint` takes any
 other path (e.g. `models/fable-mini-final.pt`, the shipped fp16 copy).
+Generation is KV-cached (one single-token forward per token, 3-5× faster than
+re-running the context each step) and tokens stream to the terminal as they
+are sampled (`--no-stream` restores the batch print).
 
 ## Hugging Face
 
@@ -152,6 +160,11 @@ Shipped config: vocab 2048 (byte-level BPE, 1789 merges), context 512,
 Trained with AdamW (lr 3e-4, wd 0.1 on matrices), 100-step linear warmup,
 cosine decay to 10%, gradient-norm clip 1.0, batch 8×512 tokens.
 
+Generation uses a from-scratch KV cache (`FableKVCache`): prefill the prompt,
+then one single-token forward per sampled token — greedy cached output is
+verified identical to the uncached path, and CPU generation is 3-5× faster
+(~350-530 tok/s on 2 threads vs ~80-110 before; see `scripts/bench_generation.py`).
+
 ## Known limitations
 
 - **Tiny corpus, memorization**: trained on ~400 KB of repo text; train loss
@@ -164,8 +177,8 @@ cosine decay to 10%, gradient-norm clip 1.0, batch 8×512 tokens.
   contains refusal *styles*, but a 3.3M model cannot be trusted to refuse
   anything. Do not use it for anything real.
 - **Context**: 512 tokens; longer conversations are cropped from the left.
-- **Speed**: ~4.5k tokens/s training throughput on 2 CPUs; generation is
-  interactive-ish for short replies.
+- **Speed**: ~4.5k tokens/s training throughput on 2 CPUs; generation
+  ~350-530 tok/s (KV-cached; see `scripts/bench_generation.py`).
 
 ## Next steps
 
@@ -173,9 +186,12 @@ cosine decay to 10%, gradient-norm clip 1.0, batch 8×512 tokens.
   larger data multiplier on the Fable doc.
 - A second model trained *without* the system-prompt document, to separate
   "XML-soup register" from "chat register".
-- Eval additions: distinct-n, a small held-out prompt set scored by format
-  adherence rather than eyeballing.
+- Eval: a small held-out prompt set scored by format adherence rather than
+  eyeballing (distinct-1/2/3 diversity is measured since v0.2.0).
 - Try weight tying off / d_ff 1024 at 6 layers if RAM allows.
+- Retrain with the v0.2.0 leak-free dialogue upweighting so the val number is
+  a clean held-out figure (the v0.1 recipe leaked val dialogue docs into train
+  via --dialogue-mult; see CHANGELOG.md).
 
 ## Provenance and honesty
 
