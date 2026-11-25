@@ -1,0 +1,5 @@
+name,params,status,steps,batch,train_loss_first,train_loss_last,val_loss,tokens_per_s,elapsed_s,measured_peak_rss_mb,estimated_peak_gb,reason
+3.3m,3285504,trained,40,8,7.6713,6.3463,6.379,4554.1,36.0,1010.4,,
+15m,15167232,trained,40,8,7.6988,6.3105,6.3612,1234.9,132.7,2234.6,,
+59m,58646016,trained,40,2,7.8405,6.4679,6.5627,401.2,102.1,2234.6,,
+344m,343839744,blocked_ram,40,,,,,,,,5.95,estimated peak 5.95 GB > 1.53 GB usable

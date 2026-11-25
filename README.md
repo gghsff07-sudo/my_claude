@@ -21,7 +21,7 @@ model's honest capability summary.
 | Evaluation (loss, perplexity, samples) | `fable_lm/eval.py` → `EVAL.md` |
 | Synthetic Fable-style dialogues (training data) | `data/dialogues/` |
 | Shipped checkpoint (fp16, ~7.6 MB) | `models/fable-mini-final.pt` |
-| Tests (79: tokenizer, model, data, training, generation, KV cache, chat commands, demo utils, HF compat) | `tests/` |
+| Tests (91: tokenizer, model, data, training, generation, KV cache, chat commands, demo utils, HF compat, scale ladder) | `tests/` |
 | HF wrapper (config, modeling — self-contained remote code) | `hf_fable/` |
 | HF conversion scripts (weights, tokenizer, upload, Space) | `scripts/` |
 | HF-format model folder (Hub artifact) | `hf_model/` (weights gitignored) |
@@ -35,7 +35,7 @@ model's honest capability summary.
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -e ".[hf,dev]"   # or: make setup
-python -m pytest tests/ -q             # 79 tests (53 original + 26 across v0.2.0/v0.3.0)
+python -m pytest tests/ -q             # 91 tests (53 original + 38 across v0.2.0-v0.4.0)
 ```
 
 Installing is optional (everything also runs as `python -m fable_lm.*` from the
@@ -66,6 +66,10 @@ python -m fable_lm.eval --checkpoint models/fable-mini-final.pt
 
 # generation-speed benchmark
 python -m fable_lm.bench
+
+# 30B scale-up automation: plan the whole ladder, train every rung that fits
+python -m fable_lm.scale --target 30b            # trains until the hardware ceiling
+python -m fable_lm.scale --target 30b --dry-run  # plan only — safe for 30B itself
 ```
 
 The chat CLI loads `checkpoints/best.pt` by default; `--checkpoint` takes any
@@ -73,6 +77,26 @@ other path (e.g. `models/fable-mini-final.pt`, the shipped fp16 copy).
 Generation is KV-cached (one single-token forward per token, 3-5× faster than
 re-running the context each step) and tokens stream to the terminal as they
 are sampled (`--no-stream` restores the batch print).
+
+## Scaling to 30B (and the honest hardware math)
+
+`fable_lm/scale.py` automates parameter scale-up toward any target, 30B
+included: a rung ladder (3.3M → 15M → 59M → 344M → 1.2B → 4.1B → 30B) where
+each rung's parameter count comes from `ModelConfig.param_count()` and is
+cross-checked against real instantiation when the rung trains, peak-RAM is
+estimated before anything is allocated, the batch auto-fits (8→4→2→1), and
+rungs that cannot fit are marked BLOCKED with their exact requirement. The
+**30B preset is real and verified: 49 layers × d_model 7168 × 56 heads ×
+d_ff 28672 = 30,233,097,216 parameters exactly.**
+
+What no software can change: a 30B model needs ~483 GB of RAM just for fp32
+AdamW training state (16 bytes/parameter) plus activations, and cluster-scale
+compute. This machine (2 CPU threads, 4 GB RAM) trains rungs up to 59M —
+`results/scale_ladder.json` holds the measured stops — and the 30B rung is
+plannable (`--dry-run`, never instantiated) but not trainable here. The
+shipped model in `models/` is unchanged by all of this; the ladder is a
+capability, not a new artifact.
+
 
 ## Hugging Face
 

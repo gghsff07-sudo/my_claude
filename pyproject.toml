@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fable-lm"
-version = "0.3.0"
+version = "0.4.0"
 description = "A miniature Fable-5.2-style language model: byte-BPE tokenizer, decoder-only transformer, training loop, chat CLI — all from scratch, plus a Hugging Face wrapper."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,6 +39,7 @@ fable-train = "fable_lm.train:main"
 fable-chat = "fable_lm.chat:main"
 fable-eval = "fable_lm.eval:main"
 fable-bench = "fable_lm.bench:main"
+fable-scale = "fable_lm.scale:main"
 
 [project.urls]
 Repository = "https://github.com/gghsff07-sudo/my_claude"

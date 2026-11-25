@@ -43,3 +43,15 @@ token's permissions were later updated on GitHub's side; pushes now work.
 - [x] Retrain run3: fresh tokenizer + leak-free dialogue upweighting
 - [x] Artifacts regenerated: fp16 model, HF folder, eval results, logs
 
+## v0.4.0 (2026-11-25) — 30B scale-up automation
+
+- [x] 30B preset: 49L x d7168 x h56 x ff28672 = 30,233,097,216 params exactly
+      (arithmetic-verified; cross-checked against instantiation on small rungs)
+- [x] fable_lm/scale.py + fable-scale: ladder automation, RAM gating, batch
+      auto-fit, OOM-tolerant stop, dry-run planning, results/scale_ladder.*
+- [x] 12 new tests (91 total); shipped 3.3M model and artifacts unchanged
+- [x] Measured on this box: trains 3.3M (4548 tok/s) / 15M (1270) / 59M
+      (430, batch auto-fit) rungs, blocks at 344M (~5.95 GB peak vs 1.57 GB
+      budget); 30B needs ~492 GB peak + cluster GPUs; first 59M attempt was
+      OOM-killed (SIGKILL) at the 75% budget — gate now 50%, incremental writes
+

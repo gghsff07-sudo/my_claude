@@ -1,0 +1,80 @@
+{
+  "target": 30000000000,
+  "ram_total_bytes": 4361621504,
+  "ram_available_at_start_bytes": 3057061888,
+  "mem_limit_bytes": 1528530944,
+  "rungs": [
+    {
+      "name": "3.3m",
+      "params": 3285504,
+      "config": {
+        "n_layers": 4,
+        "d_model": 256,
+        "n_heads": 4,
+        "d_ff": 768,
+        "context_len": 512
+      },
+      "steps": 40,
+      "batch": 8,
+      "train_loss_first": 7.6713,
+      "train_loss_last": 6.3463,
+      "val_loss": 6.379,
+      "tokens_per_s": 4554.1,
+      "elapsed_s": 36.0,
+      "measured_peak_rss_mb": 1010.4,
+      "status": "trained"
+    },
+    {
+      "name": "15m",
+      "params": 15167232,
+      "config": {
+        "n_layers": 8,
+        "d_model": 384,
+        "n_heads": 6,
+        "d_ff": 1536,
+        "context_len": 512
+      },
+      "steps": 40,
+      "batch": 8,
+      "train_loss_first": 7.6988,
+      "train_loss_last": 6.3105,
+      "val_loss": 6.3612,
+      "tokens_per_s": 1234.9,
+      "elapsed_s": 132.7,
+      "measured_peak_rss_mb": 2234.6,
+      "status": "trained"
+    },
+    {
+      "name": "59m",
+      "params": 58646016,
+      "config": {
+        "n_layers": 8,
+        "d_model": 768,
+        "n_heads": 12,
+        "d_ff": 3072,
+        "context_len": 512
+      },
+      "steps": 40,
+      "batch": 2,
+      "train_loss_first": 7.8405,
+      "train_loss_last": 6.4679,
+      "val_loss": 6.5627,
+      "tokens_per_s": 401.2,
+      "elapsed_s": 102.1,
+      "measured_peak_rss_mb": 2234.6,
+      "status": "trained"
+    },
+    {
+      "name": "344m",
+      "params": 343839744,
+      "params_hr": "343.8M",
+      "estimated_peak_gb": 5.95,
+      "batch": null,
+      "feasible": false,
+      "est_tokens_per_s": 40.1,
+      "steps": 40,
+      "status": "blocked_ram",
+      "reason": "estimated peak 5.95 GB > 1.53 GB usable"
+    }
+  ]
+}

@@ -1,5 +1,66 @@
 # Changelog
 
+## v0.4.0 — 30B scale-up automation (config + ladder, hardware-honest)
+
+Adds the machinery the 30B request needs: a verified 30,000,000,000-parameter
+configuration and an automated training ladder that walks from the shipped 3.3M
+model toward any parameter target, training every rung that fits the machine
+and stopping with exact requirements where it does not. The shipped 3.3M model
+and all its artifacts are unchanged.
+
+Stated plainly: a 30B model cannot be trained on this class of hardware, and
+this release does not pretend otherwise. 30.23B parameters need ~483 GB of RAM
+for fp32 AdamW training (16 bytes/param plus activations) and cluster-scale
+compute — this machine has 4 GB and 2 CPU threads. What v0.4.0 delivers is the
+verified target config, the automation that reaches it on hardware that can,
+and the honest measurement of where this hardware stops.
+
+### Added
+
+- **`fable_lm/scale.py` + `fable-scale` entry point** — the automation:
+  - a curated rung ladder 3.3M → 15M → 59M → 344M → 1.2B → 4.1B → 30B, each
+    rung's parameter count computed by `ModelConfig.param_count()` and
+    cross-checked against real instantiation when trained;
+  - `--target` accepts `30b`, `15m`, `3e9`, or a raw integer;
+  - heuristic peak-RAM estimation (16 bytes/param for AdamW fp32 states +
+    activation estimate), auto batch-fitting (8 → 4 → 2 → 1) against a
+    safety-capped fraction of available RAM;
+  - trains each feasible rung for a smoke budget (`--steps`, default 40),
+    recording train/val loss, tokens/s, elapsed, and measured peak RSS;
+  - rungs that cannot fit are marked BLOCKED with the exact requirement, and
+    the run stops there — "train until the target or the hardware ceiling,
+    whichever comes first";
+  - `--dry-run` plans the whole 30B path without instantiating any model
+    (this is how the 30B rung is planned on a 4 GB machine);
+  - results land in `results/scale_ladder.csv` + `results/scale_ladder.json`.
+- **The 30B preset** (LADDER["30b"]): 49 layers, d_model 7168, 56 heads
+  (head dim 128), d_ff 28672 — 30,233,097,216 parameters exactly, verified by
+  the same `param_count()` formula that the tests cross-check against
+  instantiation on the smaller rungs.
+- 12 tests (`tests/test_scale.py`): param-count arithmetic vs instantiation,
+  30B preset bounds and shape constraints, ladder monotonicity and target
+  coverage, target parsing, memory-estimate gating, and dry-run safety.
+
+### Measured on this machine (2 threads, 4.16 GB RAM)
+
+`python -m fable_lm.scale --target 30b` (default 40 smoke steps per rung):
+
+| rung | params | batch | train loss | val loss | tok/s | peak RSS |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3.3m | 3,285,504 | 8 | 7.67 → 6.35 | 6.38 | 4,554 | 1.01 GB |
+| 15m | 15,167,232 | 8 | 7.70 → 6.31 | 6.36 | 1,235 | 2.23 GB |
+| 59m | 58,646,016 | 2 (auto-fit) | 7.84 → 6.47 | 6.56 | 401 | 2.23 GB |
+| 344m | 343,839,744 | — | BLOCKED: ~5.95 GB estimated peak vs 1.53 GB budget | | | |
+
+The 59M rung is the largest this machine can train — 17.9× the shipped model —
+and every trained rung's instantiated parameter count matched
+`param_count()` exactly (measured peak RSS is the process high-water mark:
+the CPU allocator does not return memory between rungs). Full numbers in
+`results/scale_ladder.json`; the automation's console summary states the 30B
+requirement outright. A first attempt at the 59M rung was killed by the Linux
+OOM killer (SIGKILL, exit 137) under the original 75% RAM budget — the gate
+now defaults to 50% and results persist incrementally after every rung.
+
 ## v0.3.0 — data upgrade and honest retrain
 
 The v0.2.0 report's top recommendation was to retrain with the leak-free
