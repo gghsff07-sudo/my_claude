@@ -5,6 +5,8 @@ hardware ceiling, whichever comes first.
 Usage:
     python -m fable_lm.scale --target 30b             # plan + train all feasible rungs
     python -m fable_lm.scale --target 30b --dry-run   # plan only (never instantiates)
+    python -m fable_lm.scale --target 30b --safety 0.85   # squeeze: biggest trainable rungs
+    python -m fable_lm.scale --target 30b --only 99m --steps 120 --save-ckpt
     fable-scale --target 30b                           # installed entry point
 
 Each rung is trained for a smoke budget of steps (the per-rung loss curve
@@ -15,7 +17,9 @@ parameters need ~483 GB of RAM for AdamW fp32 training and cluster-scale
 compute — the config itself is arithmetic-verified (param_count()) and
 cross-checked against real instantiation on the small rungs.
 
-Results: results/scale_ladder.csv + results/scale_ladder.json
+Results: results/scale_ladder.csv + results/scale_ladder.json (a single-rung
+--only run writes results/scale_<name>.* instead, so it never clobbers the
+full-ladder record).
 """
 
 from __future__ import annotations
@@ -46,6 +50,8 @@ LADDER: dict[str, ModelConfig] = {
     "3.3m":  ModelConfig(n_layers=4,  d_model=256,  n_heads=4,   d_ff=768),    # shipped miniature
     "15m":   ModelConfig(n_layers=8,  d_model=384,  n_heads=6,   d_ff=1536),
     "59m":   ModelConfig(n_layers=8,  d_model=768,  n_heads=12,  d_ff=3072),
+    "99m":   ModelConfig(n_layers=10, d_model=896,  n_heads=14,  d_ff=3584),   # squeeze rung
+    "154m":  ModelConfig(n_layers=12, d_model=1024, n_heads=16,  d_ff=4096),   # squeeze rung
     "344m":  ModelConfig(n_layers=12, d_model=1536, n_heads=24,  d_ff=6144),
     "1.2b":  ModelConfig(n_layers=24, d_model=2048, n_heads=32,  d_ff=8192),
     "4.1b":  ModelConfig(n_layers=36, d_model=3072, n_heads=48,  d_ff=12288),
@@ -86,12 +92,16 @@ def training_peak_bytes(cfg: ModelConfig, batch: int, ctx: int = 512) -> int:
     """Heuristic peak RAM for AdamW fp32 training of one rung.
 
     weights + grads + 2 Adam moments = 16 bytes/param; activations roughly
-    12 * B * T * d * L * 4 bytes (standard transformer-training heuristic,
-    attention maps and intermediates included, no checkpointing).
+    30 * B * T * d * L * 4 bytes. The 30 coefficient is CALIBRATED, not
+    textbook: it back-predicts all four observations of the v0.4.0 runs —
+    15m@b8 measured ~2.2 GB RSS (est 1.75), 59m@b4 measured 2.97 GB and
+    survived (est 2.45), 59m@b8 was SIGKILLed by the OOM killer (est 3.94).
+    The old 12 coefficient passed 59m@b8 through a 75% gate and got the
+    process killed; this one errs on the side of the OOM killer.
     """
     p = cfg.param_count()
     d, L = cfg.d_model, cfg.n_layers
-    return 16 * p + 12 * batch * ctx * d * L * 4
+    return 16 * p + 30 * batch * ctx * d * L * 4
 
 
 def _meminfo(key: str) -> int | None:
@@ -118,11 +128,17 @@ def estimate_steps_per_second(cfg: ModelConfig, base_tps: float = 4200.0) -> flo
     return base_tps * (LADDER["3.3m"].param_count() / cfg.param_count())
 
 
-def fit_batch(cfg: ModelConfig, mem_limit: int, ctx: int = 512) -> int | None:
-    """Largest power-of-two batch (8..1) whose estimated peak fits mem_limit."""
-    for batch in (8, 4, 2, 1):
+def fit_batch(cfg: ModelConfig, mem_limit: int, ctx: int = 512,
+              max_batch: int = 8) -> int | None:
+    """Largest power-of-two batch (max_batch down to 1) whose estimated peak
+    fits mem_limit. --batch sets max_batch, so `--batch 1` pins the batch."""
+    batch = 1
+    while batch * 2 <= max_batch:
+        batch *= 2
+    while batch >= 1:
         if training_peak_bytes(cfg, batch, ctx) <= mem_limit:
             return batch
+        batch //= 2
     return None
 
 
@@ -130,9 +146,11 @@ def fit_batch(cfg: ModelConfig, mem_limit: int, ctx: int = 512) -> int | None:
 # Training one rung (reuses the run3 pipeline: same data, tokenizer, recipe)
 # ---------------------------------------------------------------------------
 
-def train_rung(rung: Rung, steps: int, batch: int, tok) -> dict:
+def train_rung(rung: Rung, steps: int, batch: int, tok, save_ckpt: bool = False) -> dict:
     """Train one rung for a smoke budget. Returns metrics; never pretends a
-    scale smoke is a converged model."""
+    scale smoke is a converged model. With save_ckpt=True the final weights
+    land in checkpoints/scale/<name>-final.pt (fp32 state_dict, no optimizer
+    — the rung artifacts are measurements, not shipped models)."""
     torch.manual_seed(42)
     torch.set_num_threads(2)
     device = torch.device("cpu")
@@ -182,6 +200,14 @@ def train_rung(rung: Rung, steps: int, batch: int, tok) -> dict:
 
     elapsed = time.perf_counter() - t0
     peak_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024  # Linux: KiB
+    if save_ckpt:
+        ckpt_dir = REPO / "checkpoints" / "scale"
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        ckpt_path = ckpt_dir / f"{rung.name}-final.pt"
+        torch.save({"model": model.state_dict(), "cfg": model.config_dict(),
+                    "steps": steps, "batch": batch,
+                    "note": "scale-ladder rung checkpoint; measurement, not a shipped model"},
+                   ckpt_path)
     return {
         "name": rung.name, "params": rung.params,
         "config": {"n_layers": cfg.n_layers, "d_model": cfg.d_model,
@@ -210,11 +236,11 @@ def parse_target(s: str) -> int:
     return int(float(t))
 
 
-def plan_rungs(target: int, steps: int, mem_limit: int) -> list[dict]:
+def plan_rungs(target: int, steps: int, mem_limit: int, max_batch: int = 8) -> list[dict]:
     """Plan every rung to the target WITHOUT instantiating any model."""
     plan = []
     for rung in build_ladder(target):
-        batch = fit_batch(rung.cfg, mem_limit)
+        batch = fit_batch(rung.cfg, mem_limit, max_batch=max_batch)
         est = training_peak_bytes(rung.cfg, batch or 1)
         plan.append({
             "name": rung.name, "params": rung.params, "params_hr": rung.params_hr,
@@ -242,6 +268,11 @@ def main() -> None:
                          "OOM killer SIGKILLs — uncatchable — when it is wrong)")
     ap.add_argument("--dry-run", action="store_true",
                     help="plan only; never instantiate a model (safe for 30B)")
+    ap.add_argument("--only", type=str, default=None, metavar="RUNG",
+                    help="train only this rung (a LADDER name, e.g. 99m); results go to "
+                         "results/scale_<name>.* so the full-ladder record is kept")
+    ap.add_argument("--save-ckpt", action="store_true",
+                    help="save the trained rung's weights to checkpoints/scale/<name>-final.pt")
     args = ap.parse_args()
 
     target = parse_target(args.target)
@@ -252,7 +283,14 @@ def main() -> None:
           f"{ram_start / 1e9:.2f} GB available | usable budget: {mem_limit / 1e9:.2f} GB "
           f"(x {args.safety:.0%})")
 
-    plan = plan_rungs(target, args.steps, mem_limit)
+    plan = plan_rungs(target, args.steps, mem_limit, max_batch=args.batch)
+    if args.only:
+        if args.only not in LADDER:
+            raise SystemExit(f"--only {args.only}: not a LADDER rung "
+                             f"({', '.join(LADDER)})")
+        plan = [r for r in plan if r["name"] == args.only]
+        if not plan:
+            raise SystemExit(f"--only {args.only}: not below the target {target:,}")
     print("\nladder plan (param_count() arithmetic — no model is built for this):")
     for r in plan:
         status = f"trainable @ batch {r['batch']}" if r["feasible"] else \
@@ -273,10 +311,12 @@ def main() -> None:
 
     # -------- persist (incrementally: a hard OOM kill mid-rung must not lose
     # the rungs that already trained) --------
+    stem = f"scale_{args.only}" if args.only else "scale_ladder"
+
     def persist() -> None:
         out_dir = REPO / "results"
         out_dir.mkdir(exist_ok=True)
-        csv_path = out_dir / "scale_ladder.csv"
+        csv_path = out_dir / f"{stem}.csv"
         with open(csv_path, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=["name", "params", "status", "steps", "batch",
                                               "train_loss_first", "train_loss_last", "val_loss",
@@ -285,7 +325,7 @@ def main() -> None:
             w.writeheader()
             for row in results:
                 w.writerow({k: row.get(k, "") for k in w.fieldnames})
-        (out_dir / "scale_ladder.json").write_text(json.dumps(
+        (out_dir / f"{stem}.json").write_text(json.dumps(
             {"target": target, "ram_total_bytes": ram_total,
              "ram_available_at_start_bytes": ram_start,
              "mem_limit_bytes": mem_limit, "rungs": results},
@@ -303,7 +343,7 @@ def main() -> None:
         print(f"\n[{r['name']}] training {rung.params_hr} params "
               f"({r['steps']} steps, batch {r['batch']}) ...")
         try:
-            metrics = train_rung(rung, r["steps"], r["batch"], tok)
+            metrics = train_rung(rung, r["steps"], r["batch"], tok, save_ckpt=args.save_ckpt)
             metrics["status"] = "trained"
             results.append(metrics)
             persist()
@@ -327,7 +367,7 @@ def main() -> None:
             break
 
     persist()
-    print("\nwritten: scale_ladder.csv, scale_ladder.json")
+    print(f"\nwritten: {stem}.csv, {stem}.json")
 
     trained = [r for r in results if r["status"] == "trained"]
     blocked = [r for r in results if r["status"] != "trained"]

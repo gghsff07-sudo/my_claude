@@ -70,6 +70,12 @@ python -m fable_lm.bench
 # 30B scale-up automation: plan the whole ladder, train every rung that fits
 python -m fable_lm.scale --target 30b            # trains until the hardware ceiling
 python -m fable_lm.scale --target 30b --dry-run  # plan only — safe for 30B itself
+python -m fable_lm.scale --target 30b --safety 0.85        # squeeze: biggest trainable rungs
+python -m fable_lm.scale --target 30b --only 99m --steps 120 --save-ckpt
+                                                     # one rung, real budget, weights saved
+
+# the 30B construction attempt, for the record (dies at layer 2/49 here)
+python -m fable_lm.attempt        # results/attempt_30b.json
 ```
 
 The chat CLI loads `checkpoints/best.pt` by default; `--checkpoint` takes any
@@ -81,18 +87,24 @@ are sampled (`--no-stream` restores the batch print).
 ## Scaling to 30B (and the honest hardware math)
 
 `fable_lm/scale.py` automates parameter scale-up toward any target, 30B
-included: a rung ladder (3.3M → 15M → 59M → 344M → 1.2B → 4.1B → 30B) where
-each rung's parameter count comes from `ModelConfig.param_count()` and is
-cross-checked against real instantiation when the rung trains, peak-RAM is
-estimated before anything is allocated, the batch auto-fits (8→4→2→1), and
-rungs that cannot fit are marked BLOCKED with their exact requirement. The
+included: a rung ladder (3.3M → 15M → 59M → 99M → 154M → 344M → 1.2B → 4.1B →
+30B, densified near the memory ceiling) where each rung's parameter count
+comes from `ModelConfig.param_count()` and is cross-checked against real
+instantiation when the rung trains, peak-RAM is estimated before anything is
+allocated (the activation term is calibrated against the OOM-kill and RSS
+measurements of the v0.4.0 runs), the batch auto-fits (8→4→2→1), and rungs
+that cannot fit are marked BLOCKED with their exact requirement. The
 **30B preset is real and verified: 49 layers × d_model 7168 × 56 heads ×
 d_ff 28672 = 30,233,097,216 parameters exactly.**
 
 What no software can change: a 30B model needs ~483 GB of RAM just for fp32
 AdamW training state (16 bytes/parameter) plus activations, and cluster-scale
-compute. This machine (2 CPU threads, 4 GB RAM) trains rungs up to 59M —
-`results/scale_ladder.json` holds the measured stops — and the 30B rung is
+compute. `fable_lm/attempt.py` records the direct construction attempt on
+this machine: the child process is SIGKILLed by the OOM killer during layer
+2 of 49 — layer 1 alone (635M params) resident pushed RSS to 2.6 GB
+(`results/attempt_30b.json` holds the full trace). The squeeze ladder
+(`--safety 0.85`) trains every rung that physically fits;
+`results/scale_ladder.json` holds the measured stops. The 30B rung is
 plannable (`--dry-run`, never instantiated) but not trainable here. The
 shipped model in `models/` is unchanged by all of this; the ladder is a
 capability, not a new artifact.

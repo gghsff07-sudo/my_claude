@@ -12,3 +12,4 @@ hf_model/model.safetensors
 build/
 dist/
 *.egg-info/
+checkpoints/scale/

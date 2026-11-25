@@ -55,3 +55,17 @@ token's permissions were later updated on GitHub's side; pushes now work.
       budget); 30B needs ~492 GB peak + cluster GPUs; first 59M attempt was
       OOM-killed (SIGKILL) at the 75% budget — gate now 50%, incremental writes
 
+## v0.4.1 (2026-11-25) — "train it to 30B": attempt + squeeze
+
+- [x] fable_lm/attempt.py + fable-attempt: real 30B construction attempt in
+      a child process (SIGKILL is uncatchable, so the parent records the
+      death) — killed constructing layer 2/49; layer 1 = 635M params took
+      RSS to 2.6 GB; trace in results/attempt_30b.json
+- [x] Squeeze rungs 99m/154m + calibrated activation term (12 -> 30,
+      back-fit to the v0.4.0 OOM/RSS data); --batch now actually pins the
+      batch (was declared but dead); --only RUNG + --save-ckpt added
+- [x] Squeeze ladder (safety 0.85): trains up to 99m @batch2 (249 tok/s,
+      3.09 GB RSS), 154m blocked (3.21 GB vs 2.77 budget); 150-step ceiling
+      train at batch 2 was OOM-killed (marginal), re-run at batch 1
+- [x] 10 new tests (101 total); shipped model unchanged
+

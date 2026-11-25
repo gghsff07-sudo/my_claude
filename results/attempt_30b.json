@@ -1,0 +1,37 @@
+{
+  "target_params": 30233097216,
+  "config": {
+    "n_layers": 49,
+    "d_model": 7168,
+    "n_heads": 56,
+    "d_ff": 28672,
+    "context_len": 512,
+    "vocab_size": 2048
+  },
+  "machine_ram_total_bytes": 4361621504,
+  "ram_available_at_start_bytes": 3214823424,
+  "outcome": "SIGKILLed by the OOM killer (signal 9)",
+  "exit_code": -9,
+  "elapsed_s": 4.4,
+  "layers_completed": 1,
+  "params_built": 634977280,
+  "fraction_of_target": 0.021003,
+  "last_event": "layer 1/49 allocated",
+  "progress": [
+    {
+      "event": "embeddings allocated",
+      "layer": null,
+      "params_built": 18350080,
+      "rss_mb": 294,
+      "peak_mb": 294
+    },
+    {
+      "event": "layer 1/49 allocated",
+      "layer": 1,
+      "params_built": 634977280,
+      "rss_mb": 2642,
+      "peak_mb": 2642
+    }
+  ],
+  "child_stderr_tail": ""
+}

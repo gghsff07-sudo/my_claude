@@ -45,6 +45,25 @@ def test_thirty_b_preset_is_really_30b():
     assert cfg.d_ff == 4 * cfg.d_model
 
 
+@pytest.mark.parametrize(
+    "name, lo, hi",
+    [("3.3m", 3.2e6, 3.4e6), ("15m", 15.0e6, 15.3e6), ("59m", 58.4e6, 58.8e6),
+     ("99m", 98.0e6, 99.5e6), ("154m", 153.0e6, 154.5e6), ("30b", 30.0e9, 30.3e9)],
+)
+def test_rung_params_match_labels(name, lo, hi):
+    """Labels are honest within rounding — including the two squeeze rungs."""
+    assert lo <= LADDER[name].param_count() <= hi
+
+
+def test_squeeze_rungs_fill_the_gap():
+    """99m/154m densify the ladder near the memory ceiling so the automation
+    can climb as close to the wall as the RAM allows."""
+    params = [LADDER[n].param_count() for n in ("59m", "99m", "154m", "344m")]
+    assert params == sorted(params) and len(set(params)) == 4
+    assert 1.3 < params[1] / params[0] < 2.0  # dense near the ceiling
+    assert params[2] / params[1] < params[3] / params[2]
+
+
 def test_ladder_is_monotonic_and_reaches_target():
     rungs = build_ladder(TARGET_30B)
     params = [r.params for r in rungs]

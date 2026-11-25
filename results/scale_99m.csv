@@ -1,0 +1,2 @@
+name,params,status,steps,batch,train_loss_first,train_loss_last,val_loss,tokens_per_s,elapsed_s,measured_peak_rss_mb,estimated_peak_gb,reason
+99m,98714112,trained,150,1,7.7512,7.0855,6.385,224.0,342.9,2482.7,,

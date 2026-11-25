@@ -1,5 +1,70 @@
 # Changelog
 
+## v0.4.1 — "train it to 30B": the attempt, the squeeze, the measured wall
+
+The follow-up request was to actually train toward 30B. This release does
+everything that is physically doable on this machine and records, with
+receipts, exactly where the wall is. The headline measurements: the direct
+30B construction attempt is SIGKILLed by the OOM killer during layer 2 of 49
+(layer 1 alone — 635M params — takes RSS to 2.6 GB; each layer's fp32 AdamW
+state alone is 9.87 GB vs 4.36 GB total RAM), and the largest model this
+machine can train at all is the 99M rung — 0.33% of the 30B target.
+
+### Added
+
+- **`fable_lm/attempt.py` + `fable-attempt` entry point** — the 30B
+  construction attempt, for the record: a child process builds the real
+  parameter volume (real Block modules, real initializers, every page
+  touched) layer by layer with per-layer RSS reporting; the parent records
+  where the OOM killer stops it (SIGKILL is uncatchable in Python, which is
+  precisely why the attempt runs as a child). Output:
+  `results/attempt_30b.json` — exit code, signal, layers completed, RSS
+  trace, and the fraction of the 30B target that existed at death (2.10%).
+- **Squeeze rungs `99m` (10L × d896) and `154m` (12L × d1024)** — the ladder
+  is densified near the memory ceiling so the automation can climb as close
+  to the wall as RAM allows.
+- **Calibrated memory model** — `training_peak_bytes` activation term
+  12 → 30 · B·T·d·L·4 bytes, back-fit to all four v0.4.0 observations
+  (15m@b8 2.2 GB RSS, 59m@b4 2.97 GB survived, 59m@b8 SIGKILLed). The old
+  coefficient passed a rung that then killed the process; the new one errs
+  on the side of the OOM killer.
+- **`--only RUNG` and `--save-ckpt`** for `fable-scale`: train a single rung
+  (results go to `results/scale_<name>.*` so the full-ladder record is
+  never clobbered) and save its weights to
+  `checkpoints/scale/<name>-final.pt`.
+- 10 new tests (101 total): squeeze-rung labels and ordering, ladder gap
+  filling, and attempt-progress parsing.
+
+### Measured on this machine (2 threads, 4.16 GB RAM)
+
+Squeeze ladder `--target 30b --safety 0.85` (40 steps per rung):
+
+| rung | params | batch | train loss | val loss | tok/s | peak RSS |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3.3m | 3,285,504 | 8 | 7.67 → 6.35 | 6.38 | 4,300 | 1.01 GB |
+| 15m | 15,167,232 | 8 | 7.70 → 6.31 | 6.36 | 1,243 | 2.28 GB |
+| 59m | 58,646,016 | 4 | 7.81 → 6.57 | 6.49 | 429 | 2.97 GB |
+| 99m | 98,714,112 | 2 | 7.76 → 6.73 | 6.59 | 249 | 3.09 GB |
+| 154m | 153,729,024 | — | BLOCKED: ~3.21 GB estimated peak vs 2.77 GB budget | | | |
+
+The 99M rung was then trained for real: 150 steps at batch 1, 76,800 tokens
+(~0.65 epochs of the 118,784-token corpus), train loss 7.75 → 7.09, val
+6.385, 224 tok/s, peak RSS 2.48 GB; weights saved to
+`checkpoints/scale/99m-final.pt` (see `results/scale_99m.json`). The corpus,
+not the architecture, is what limits it — a 30B-class model wants ~605B
+tokens, about 5,000,000x more than the repo has. Reaching the recorded run
+took three attempts, each honest: the 150-step run at batch 2 was SIGKILLed
+mid-run (the ceiling is marginal — the 40-step squeeze pass had survived in
+a warm process), a re-run was blocked by a dropped --safety flag, and the
+batch-1 run completed cleanly.
+
+The 30B ledger, measured: 98.7M trained = 0.33% of the target; the attempt
+died with 2.10% of the parameter volume resident; full 30B AdamW fp32
+training needs ~492 GB peak vs 4.36 GB total (~113x); at 1/params-scaled
+throughput the 30B rung would run at ~0.5 tok/s (~38,000 years for a
+Chinchilla-style budget). Reaching 30B requires multi-GPU clusters and a
+trillion-token-scale dataset — not patience on this CPU box.
+
 ## v0.4.0 — 30B scale-up automation (config + ladder, hardware-honest)
 
 Adds the machinery the 30B request needs: a verified 30,000,000,000-parameter

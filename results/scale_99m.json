@@ -1,0 +1,28 @@
+{
+  "target": 30000000000,
+  "ram_total_bytes": 4361621504,
+  "ram_available_at_start_bytes": 3171708928,
+  "mem_limit_bytes": 2695952588,
+  "rungs": [
+    {
+      "name": "99m",
+      "params": 98714112,
+      "config": {
+        "n_layers": 10,
+        "d_model": 896,
+        "n_heads": 14,
+        "d_ff": 3584,
+        "context_len": 512
+      },
+      "steps": 150,
+      "batch": 1,
+      "train_loss_first": 7.7512,
+      "train_loss_last": 7.0855,
+      "val_loss": 6.385,
+      "tokens_per_s": 224.0,
+      "elapsed_s": 342.9,
+      "measured_peak_rss_mb": 2482.7,
+      "status": "trained"
+    }
+  ]
+}

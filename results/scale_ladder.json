@@ -1,8 +1,8 @@
 {
   "target": 30000000000,
   "ram_total_bytes": 4361621504,
-  "ram_available_at_start_bytes": 3057061888,
-  "mem_limit_bytes": 1528530944,
+  "ram_available_at_start_bytes": 3257327616,
+  "mem_limit_bytes": 2768728473,
   "rungs": [
     {
       "name": "3.3m",
@@ -19,9 +19,9 @@
       "train_loss_first": 7.6713,
       "train_loss_last": 6.3463,
       "val_loss": 6.379,
-      "tokens_per_s": 4554.1,
-      "elapsed_s": 36.0,
-      "measured_peak_rss_mb": 1010.4,
+      "tokens_per_s": 4299.7,
+      "elapsed_s": 38.1,
+      "measured_peak_rss_mb": 1008.8,
       "status": "trained"
     },
     {
@@ -39,9 +39,9 @@
       "train_loss_first": 7.6988,
       "train_loss_last": 6.3105,
       "val_loss": 6.3612,
-      "tokens_per_s": 1234.9,
-      "elapsed_s": 132.7,
-      "measured_peak_rss_mb": 2234.6,
+      "tokens_per_s": 1242.9,
+      "elapsed_s": 131.8,
+      "measured_peak_rss_mb": 2278.8,
       "status": "trained"
     },
     {
@@ -55,26 +55,46 @@
         "context_len": 512
       },
       "steps": 40,
-      "batch": 2,
-      "train_loss_first": 7.8405,
-      "train_loss_last": 6.4679,
-      "val_loss": 6.5627,
-      "tokens_per_s": 401.2,
-      "elapsed_s": 102.1,
-      "measured_peak_rss_mb": 2234.6,
+      "batch": 4,
+      "train_loss_first": 7.8148,
+      "train_loss_last": 6.5672,
+      "val_loss": 6.4868,
+      "tokens_per_s": 428.9,
+      "elapsed_s": 191.0,
+      "measured_peak_rss_mb": 2968.1,
       "status": "trained"
     },
     {
-      "name": "344m",
-      "params": 343839744,
-      "params_hr": "343.8M",
-      "estimated_peak_gb": 5.95,
+      "name": "99m",
+      "params": 98714112,
+      "config": {
+        "n_layers": 10,
+        "d_model": 896,
+        "n_heads": 14,
+        "d_ff": 3584,
+        "context_len": 512
+      },
+      "steps": 40,
+      "batch": 2,
+      "train_loss_first": 7.7646,
+      "train_loss_last": 6.7307,
+      "val_loss": 6.5906,
+      "tokens_per_s": 248.9,
+      "elapsed_s": 164.6,
+      "measured_peak_rss_mb": 3090.7,
+      "status": "trained"
+    },
+    {
+      "name": "154m",
+      "params": 153729024,
+      "params_hr": "153.7M",
+      "estimated_peak_gb": 3.21,
       "batch": null,
       "feasible": false,
-      "est_tokens_per_s": 40.1,
+      "est_tokens_per_s": 89.8,
       "steps": 40,
       "status": "blocked_ram",
-      "reason": "estimated peak 5.95 GB > 1.53 GB usable"
+      "reason": "estimated peak 3.21 GB > 2.77 GB usable"
     }
   ]
 }
