@@ -1,0 +1,33 @@
+User: how do I change a flat bike tire?
+Assistant: Five steps: one, release the brake and loosen the wheel nuts or quick-release. Two, remove the wheel and pop one bead of the tire off the rim with a lever. Three, pull out the tube and find the puncture — a bucket of water makes bubbles at the hole. Four, patch or replace the tube, and check the inside of the tire for whatever caused the flat. Five, remount, inflate, and refit the wheel.
+User: the patch kit has instructions too, right?
+Assistant: It does, and glue-type kits need the full drying time they list — rushing that step is why patches peel off later.
+<|eos|>
+User: how do I set up two-factor authentication?
+Assistant: Start in your account's security settings and look for two-factor or multi-factor authentication. Pick an authenticator app over SMS where offered — app codes can't be intercepted the way texts can. Scan the QR code with the app, enter the six digits it shows, and — this part matters — save the recovery codes somewhere safe in case you lose the phone.
+User: where should I keep the recovery codes?
+Assistant: Somewhere offline: printed in a drawer, or in a password manager if you use one. Not in the same account they unlock.
+<|eos|>
+User: how do I cook a hard-boiled egg without the green ring?
+Assistant: The ring means overcooking. Cover the eggs with cold water, bring to a boil, then take the pot off the heat and let them sit covered for nine to ten minutes. Shock them in ice water right after, and they'll stop cooking at jammy-white, orange-yolk.
+<|eos|>
+User: how do I back up my laptop properly?
+Assistant: Follow the 3-2-1 shape: three copies of anything important, on two different kinds of media, with one copy offsite. In practice — the laptop, an external drive you back up weekly, and a cloud folder for the irreplaceable stuff like photos and documents.
+<|eos|>
+User: steps to parallel park?
+Assistant: Signal, pull alongside the car in front of the space until your mirrors align. Turn the wheel fully toward the curb and reverse until your passenger-side mirror shows the rear corner of that car. Straighten the wheel and keep reversing into the space. When your front bumper clears their rear bumper, turn the wheel fully away from the curb and ease back until centered.
+User: how much practice before this stops being scary?
+Assistant: Usually a few solo sessions — find a quiet street with cones or a forgiving car and it clicks quickly after that.
+<|eos|>
+User: how do I start composting in an apartment?
+Assistant: Get a sealed bin with a charcoal filter for the counter, keep a carbon source — shredded paper or cardboard — next to it, and balance every handful of food scraps with a handful of the dry stuff. Freeze scraps if the bin fills before collection day. If it starts to smell, you need more carbon, less moisture, or both.
+<|eos|>
+User: how do I descale a kettle?
+Assistant: Fill it a third with white vinegar and two-thirds water, boil, then leave it to sit an hour. Empty, boil plain water twice, and the flakes and film should be gone. If there's heavy scale, repeat rather than scrubbing — heating elements dislike scraping.
+<|eos|>
+User: how do I clean white sneakers?
+Assistant: Take the laces out and wash them separately. Scrub the uppers with an old toothbrush, warm water, and a little dish soap or baking-soda paste. Air dry away from a radiator — heat warps them. Insoles can come out and get the same scrub.
+<|eos|>
+User: how do I give feedback that doesn't sting?
+Assistant: Ask first — "can I share a thought on that?" lowers defenses. Then describe behavior and effect rather than character: "the late drafts compressed the review time," not "you're disorganized." Close with a specific ask, and then actually let it go.
+<|eos|>

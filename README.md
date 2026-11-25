@@ -21,7 +21,7 @@ model's honest capability summary.
 | Evaluation (loss, perplexity, samples) | `fable_lm/eval.py` → `EVAL.md` |
 | Synthetic Fable-style dialogues (training data) | `data/dialogues/` |
 | Shipped checkpoint (fp16, ~7.6 MB) | `models/fable-mini-final.pt` |
-| Tests (76: tokenizer, model, data, training, generation, KV cache, chat commands, demo utils, HF compat) | `tests/` |
+| Tests (79: tokenizer, model, data, training, generation, KV cache, chat commands, demo utils, HF compat) | `tests/` |
 | HF wrapper (config, modeling — self-contained remote code) | `hf_fable/` |
 | HF conversion scripts (weights, tokenizer, upload, Space) | `scripts/` |
 | HF-format model folder (Hub artifact) | `hf_model/` (weights gitignored) |
@@ -35,11 +35,12 @@ model's honest capability summary.
 ```bash
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -e ".[hf,dev]"   # or: make setup
-python -m pytest tests/ -q             # 76 tests (53 original + 23 in the v0.2.0 upgrade)
+python -m pytest tests/ -q             # 79 tests (53 original + 26 across v0.2.0/v0.3.0)
 ```
 
 Installing is optional (everything also runs as `python -m fable_lm.*` from the
-repo root) but gives the `fable-train` / `fable-chat` / `fable-eval` commands.
+repo root) but gives the `fable-train` / `fable-chat` / `fable-eval` /
+`fable-bench` commands.
 
 Python 3.12, PyTorch 2.15.0+cpu. The HF side additionally needs
 `transformers==5.23.0`, `safetensors`, `tokenizers` (see `requirements.txt`).
@@ -50,17 +51,21 @@ Python 3.12, PyTorch 2.15.0+cpu. The HF side additionally needs
 # train from scratch (tokenizer is trained automatically and cached)
 python -m fable_lm.train --steps 600 --run-name run1
 
-# train with the chat data upweighted (the shipped recipe)
-python -m fable_lm.train --steps 800 --run-name run2 --dialogue-mult 6 --data-mult 2
+# train with the chat data upweighted — the v0.3.0 shipped recipe (run3),
+# leak-free: extra dialogue copies come from the train split only
+python -m fable_lm.train --steps 800 --run-name run3 --dialogue-mult 6 --data-mult 2 --fresh-tokenizer
 
-# chat (streaming REPL with /temp, /topp, /seed, /system, /reset, /save, /help, /quit)
+# chat (streaming REPL with /temp, /topp, /topk, /maxnew, /seed, /system, /reset, /save, /help, /quit)
 python -m fable_lm.chat
 
-# single shot
-python -m fable_lm.chat --prompt "hello" --temperature 0.3
+# single shot (top-k available on the CLI too)
+python -m fable_lm.chat --prompt "hello" --temperature 0.3 --top-k 40
 
-# evaluate
-python -m fable_lm.eval
+# evaluate (any checkpoint)
+python -m fable_lm.eval --checkpoint models/fable-mini-final.pt
+
+# generation-speed benchmark
+python -m fable_lm.bench
 ```
 
 The chat CLI loads `checkpoints/best.pt` by default; `--checkpoint` takes any
@@ -167,9 +172,10 @@ verified identical to the uncached path, and CPU generation is 3-5× faster
 
 ## Known limitations
 
-- **Tiny corpus, memorization**: trained on ~400 KB of repo text; train loss
-  3.6 vs val loss 5.0 in run1 — the model largely memorizes. Samples are
-  recognizably in-corpus register but not coherent language.
+- **Tiny corpus, memorization**: trained on ~0.5 MB of repo text; run3's
+  train/val gap (4.36 vs 5.09) is narrower than run2's (3.62 vs 4.16) — more
+  data and the leak-free split mean less memorization, but the model still
+  mostly fits register, not language. Samples remain in-corpus word soup.
 - **No real capabilities**: no reliable QA, reasoning, tool use, or memory.
   The Fable behaviors in `STUDY.md` are imitated as *format* only; `EVAL.md`
   shows what that actually looks like.
@@ -177,21 +183,19 @@ verified identical to the uncached path, and CPU generation is 3-5× faster
   contains refusal *styles*, but a 3.3M model cannot be trusted to refuse
   anything. Do not use it for anything real.
 - **Context**: 512 tokens; longer conversations are cropped from the left.
-- **Speed**: ~4.5k tokens/s training throughput on 2 CPUs; generation
-  ~350-530 tok/s (KV-cached; see `scripts/bench_generation.py`).
+- **Speed**: ~4.2k tokens/s training throughput on 2 CPUs; generation
+  ~330-455 tok/s (KV-cached; see `scripts/bench_generation.py`).
 
 ## Next steps
 
-- More and better dialogue data (the single highest-leverage change), then a
-  larger data multiplier on the Fable doc.
+- Even more (and more diverse) dialogue data — the v0.3.0 doubling moved the
+  honest val number from 4.16 (leaked) to 5.09 (clean) without breaking the
+  register, so data remains the highest-leverage lever.
 - A second model trained *without* the system-prompt document, to separate
   "XML-soup register" from "chat register".
 - Eval: a small held-out prompt set scored by format adherence rather than
   eyeballing (distinct-1/2/3 diversity is measured since v0.2.0).
 - Try weight tying off / d_ff 1024 at 6 layers if RAM allows.
-- Retrain with the v0.2.0 leak-free dialogue upweighting so the val number is
-  a clean held-out figure (the v0.1 recipe leaked val dialogue docs into train
-  via --dialogue-mult; see CHANGELOG.md).
 
 ## Provenance and honesty
 

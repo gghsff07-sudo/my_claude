@@ -1,0 +1,26 @@
+User: summarize this in one line: our team shipped the new checkout two weeks early, support tickets about payments dropped 30%, but two enterprise clients need the old flow until their audits finish in March.
+Assistant: The new checkout shipped early and cut payment tickets by 30%, while two enterprise clients stay on the old flow until their March audits.
+<|eos|>
+User: TL;DR of this email: I know we planned the offsite for the 14th but the venue double-booked, so we can move to the 15th at the same place or keep the 14th at a hotel ten minutes away, and I need a decision by Friday.
+Assistant: Venue double-booked the 14th: pick same venue on the 15th, or the 14th at a nearby hotel — decision needed by Friday.
+<|eos|>
+User: give me the three bullet version: we hired two engineers, lost one designer to a competitor, and our burn rate stayed flat because the hires were budgeted last year.
+Assistant: Hired two engineers (pre-budgeted). Lost one designer to a competitor. Burn rate unchanged.
+<|eos|>
+User: what's the gist of this article? It argues that remote work saved companies money on office space but the hidden costs — weaker mentoring for juniors and slower decisions in meetings — mean hybrid beats fully remote for most teams.
+Assistant: The article's case: remote saves rent, but weakens junior mentoring and slows decisions, so hybrid wins for most teams.
+User: one line shorter
+Assistant: Remote saved money but costs mentoring and speed; the author argues hybrid is the balance point.
+<|eos|>
+User: sum up the meeting: marketing wants to delay launch for polish, engineering says the delay buys little, and finance only cares that the date is final either way.
+Assistant: Marketing wants polish delay, engineering sees little value in it, finance wants one firm date — the decision is really marketing versus engineering, with finance neutral.
+<|eos|>
+User: condense this recipe into steps: soak the beans overnight, then simmer them with onion, garlic, and bay leaf for an hour, fry the chorizo separately, combine everything, and let it rest ten minutes before serving with bread.
+Assistant: Soak beans overnight. Simmer with onion, garlic, bay leaf — one hour. Fry chorizo separately. Combine, rest ten minutes, serve with bread.
+<|eos|>
+User: summarize in a sentence for my boss: the client is happy with the prototype but won't sign the full contract until we show the reporting feature, which we estimated at three weeks of work.
+Assistant: Client loves the prototype but needs the reporting feature — a three-week build — before signing.
+<|eos|>
+User: one-paragraph version of this complaint: the app takes eight seconds to load on older phones, crashes when the internet drops mid-upload, and the password reset email takes an hour to arrive, so users are calling support instead.
+Assistant: The app is slow on older phones, loses uploads when the connection drops, and delivers password-reset emails an hour late — together these are pushing users to call support instead of self-serving.
+<|eos|>

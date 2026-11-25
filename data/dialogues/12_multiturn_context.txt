@@ -1,0 +1,36 @@
+User: I'm trying to cook rice and it always comes out gummy. What am I doing wrong?
+Assistant: Usually too much water or not rinsing. Rinse until the water runs mostly clear, then use a 1:1.5 rice-to-water ratio for white rice and don't stir it while it cooks. Let it rest off the heat for five minutes before fluffing.
+User: no stirring at all?
+Assistant: Right — stirring releases starch, which is what makes it gluey. Lift the lid, fluff once at the end, and that's it.
+<|eos|>
+User: my phone battery dies by 3pm every day
+Assistant: The usual suspects, in order: screen brightness, background apps, and a battery past its best. Check Settings for the battery health number first — if it's below about 80%, the battery itself is the problem. If it's healthy, look at which apps top the battery usage list.
+User: it says Instagram is 40% of usage
+Assistant: There's your answer. Either cut the scrolling or set a background refresh limit for it — that alone should get you to evening.
+<|eos|>
+User: we're moving apartments next month and I'm overwhelmed
+Assistant: Start with a throw-away pass: nothing you pack should be things you'll throw out at the new place. Then pack one room at a time, label boxes by room and by "open first" — toiletries, kettle, chargers. Moving is mostly deciding, and deciding is easier one room at a time.
+User: the labeling by open-first is smart
+Assistant: It's the box you'll thank yourself for at 11pm on day one.
+<|eos|>
+User: how long should a cold shower be if I just want to wake up?
+Assistant: Thirty to sixty seconds of genuinely cold at the end of a normal shower is plenty for a jolt — the effect comes from the cold itself, not enduring it. Ease in with limbs first.
+User: that's doable
+Assistant: It's the cheapest alarm clock there is. Want tips for actually making the switch stick?
+<|eos|>
+User: my plant's leaves are going yellow
+Assistant: Most often that's overwatering — the roots drown and the leaves yellow from the bottom up. Let the top few centimeters of soil dry out before watering again, and check the pot drains freely. If the yellowing is spotty and new growth is pale, it's more likely a feed or light issue.
+User: I water it every day, so that tracks
+Assistant: Dial it back to roughly weekly for most houseplants and see how it responds over a couple of weeks — they forgive this quickly.
+<|eos|>
+User: what's a good gift for someone who likes cooking but has everything?
+Assistant: Consumables beat gadgets for that person: good olive oil they wouldn't buy themselves, a salt they don't have, or a small batch of something local. Cooks run out of the good stuff faster than they acquire tools.
+User: nice, I'll go with olive oil
+Assistant: A solid pick — if you can, one labeled single-origin and harvest-dated feels special without being precious.
+<|eos|>
+User: how do I stop my bread going stale so fast?
+Assistant: Slice it and freeze what you won't eat in two days — frozen bread toasts straight from the freezer with no real loss. On the counter, store it cut-side down on a board rather than in the fridge; the fridge actually stales bread faster.
+<|eos|>
+User: any trick for remembering people's names at events?
+Assistant: Use the name in your first reply — "Nice to meet you, Priya" — and once more when you part. Repeating it aloud at the edges of the conversation beats silently rehearsing it.
+<|eos|>

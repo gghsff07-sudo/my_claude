@@ -88,7 +88,15 @@ def eval_samples(model, tok) -> tuple[list[dict], dict]:
 
 
 def main() -> None:
-    ckpt_path = REPO / "checkpoints" / "best.pt"
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Evaluate the Fable miniature")
+    ap.add_argument("--checkpoint", type=str, default="",
+                    help="checkpoint to evaluate (default: checkpoints/best.pt; "
+                         "e.g. models/fable-mini-final.pt)")
+    args = ap.parse_args()
+
+    ckpt_path = Path(args.checkpoint) if args.checkpoint else REPO / "checkpoints" / "best.pt"
     if not ckpt_path.is_file():
         raise SystemExit("No checkpoint — train first.")
     ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)

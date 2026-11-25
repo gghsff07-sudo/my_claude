@@ -1,0 +1,30 @@
+User: laptop or desktop for a home office?
+Assistant: Laptop if you value flexibility — you can work anywhere and dock it at a desk. Desktop if the desk is the only place you'll work and you care about more performance per dollar and a bigger screen without dongles. For most home offices, a laptop plus a monitor is the sweet spot.
+<|eos|>
+User: tea or coffee for a late-night work session?
+Assistant: Neither, ideally — at night, caffeine costs you tomorrow. If the choice is forced, tea: a typical cup has about half the caffeine of coffee, so you can still sleep when you finish.
+<|eos|>
+User: ebook or paper books?
+Assistant: Ebooks for travel, instant delivery, and adjustable font size; paper for anything you'll reference while writing, books you want to lend, and reading before bed without a screen. Most readers end up splitting: reference and fiction on the device, keepsakes on the shelf.
+<|eos|>
+User: running or cycling for general fitness?
+Assistant: Cycling is easier on the joints and better for longer sessions; running is cheaper, builds bone density, and fits more fitness into less time. If your knees are happy, a mix of both beats either alone.
+<|eos|>
+User: tabs or spaces in code?
+Assistant: Spaces win for consistency — four spaces looks the same in every editor, while tab width varies and can wreck alignment when files travel between tools. Most style guides landed there for exactly that reason. Whatever you pick, the real rule is one choice across the whole project.
+<|eos|>
+User: renting vs buying a house?
+Assistant: Renting wins when you might move within about five years — transaction costs eat the ownership gains. Buying wins when you're staying put, want fixed housing costs, and value the equity. The honest answer is less about money-maximizing than about how certain you are about the next decade.
+<|eos|>
+User: podcasts or audiobooks for learning?
+Assistant: Audiobooks for structured depth — one author, one arc, deliberate pacing. Podcasts for staying current and hearing disagreement — multiple voices, newer material, less rigor. For actually retaining something, the book usually wins.
+<|eos|>
+User: mechanical or membrane keyboard?
+Assistant: Mechanical for typing feel, repairability — switches and keycaps are replaceable — and durability. Membrane for quiet and cheap. If you share a room or an office wall with someone, membrane's silence is worth more than the feel.
+<|eos|>
+User: email or chat for work requests?
+Assistant: Chat for quick, perishable things — "can you look at this in the next hour?" Email for anything with a decision that should be findable next month. If it needs a record or more than a couple of paragraphs, it's email.
+<|eos|>
+User: morning or evening for deep work?
+Assistant: Whichever your calendar can actually protect. Morning suits most people because willpower and quiet both fade later, but evening people genuinely do better after dark. Run a one-week experiment with your hardest task at each slot and let your output vote.
+<|eos|>

@@ -108,6 +108,9 @@ def main() -> None:
                     help="early stop after N vals w/o improvement")
     ap.add_argument("--run-name", type=str, default="run1")
     ap.add_argument("--vocab-size", type=int, default=2048)
+    ap.add_argument("--fresh-tokenizer", action="store_true",
+                    help="retrain the BPE tokenizer even if data/tokenizer.json exists "
+                         "(use after adding corpus documents)")
     ap.add_argument("--data-mult", type=int, default=1, help="repeat corpus N times (more windows)")
     ap.add_argument("--dialogue-mult", type=int, default=1,
                     help="extra repetition for dialogue docs (upweights chat style)")
@@ -133,10 +136,12 @@ def main() -> None:
     print(f"corpus: {len(docs)} documents ({len(train_texts)} train / {len(val_texts)} val texts)")
 
     tok_path = REPO / "data" / "tokenizer.json"
-    if tok_path.is_file():
+    if tok_path.is_file() and not args.fresh_tokenizer:
         tokenizer = ByteBPETokenizer.load(tok_path)
         print(f"tokenizer: loaded {tok_path.name} (vocab {tokenizer.vocab_size})")
     else:
+        if tok_path.is_file():
+            print("tokenizer: retraining (the old one is in git history)")
         print("training tokenizer on train split ...")
         tokenizer = ByteBPETokenizer()
         tokenizer.train(train_texts, vocab_size=args.vocab_size, verbose=True)

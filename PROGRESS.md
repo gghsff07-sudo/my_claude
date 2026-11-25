@@ -22,3 +22,24 @@ token's permissions were later updated on GitHub's side; pushes now work.
 - [x] Step 10: `README.md` + deliverables in `download/`
 
 **All steps complete.**
+
+## v0.2.0 (2026-11-25) — audit-driven upgrade
+
+- [x] Full-code audit: 10 findings (train/val leak, checkpoint portability, gradio
+      history bug, dead --model flag, REPL crashes, rep-penalty semantics, resume
+      dropping optimizer state, CSV header, torch.load hardening, no KV cache)
+- [x] KV-cached generation (3.6-4.2x faster), streaming REPL, distinct-n eval,
+      packaging (pyproject, entry points), LICENSE, CI, Makefile, CHANGELOG
+- [x] 53 -> 76 tests, ruff clean; HF parity 0.0 and eval numbers preserved
+
+## v0.3.0 (2026-11-25) — data upgrade + retrain
+
+- [x] 12 new dialogue files (12-23): multi-turn context, clarifications,
+      corrections, comparisons, step-by-step, definitions, summaries,
+      brainstorming, smalltalk, closings, boundaries, hedging (~doubles dialogue corpus)
+- [x] Code: top_k exposed in CLI + reply(), /topk + /maxnew commands,
+      eval --checkpoint, train --fresh-tokenizer, fable-bench entry point,
+      prompt-crop hardening for max_new >= context_len
+- [x] Retrain run3: fresh tokenizer + leak-free dialogue upweighting
+- [x] Artifacts regenerated: fp16 model, HF folder, eval results, logs
+

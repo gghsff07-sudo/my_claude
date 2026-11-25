@@ -1,17 +1,17 @@
 {
   "checkpoint": "/home/z/my-project/my_claude/checkpoints/best.pt",
-  "step": 749,
+  "step": 399,
   "params": 3285504,
   "vocab_size": 2048,
   "context_len": 512,
   "loss": {
     "train": {
-      "loss": 3.6208322048187256,
-      "ppl": 37.36865325884575
+      "loss": 4.35740770964787,
+      "ppl": 78.05453192424233
     },
     "val": {
-      "loss": 4.159971237182617,
-      "ppl": 64.06967974893557
+      "loss": 5.089274883270264,
+      "ppl": 162.27215312928726
     }
   },
   "samples": [
@@ -19,26 +19,26 @@
       "tag": "casual",
       "prompt": "Hi! How are you today?",
       "temperature": 0.8,
-      "response": "I's this is story is that't leave as the one-15\" and you to beeny and hurborry is usually search — segoy, or I'm the user't render it't being matter how you need to were food and a ca- Clalated — your holarning are mode?",
-      "distinct_1": 0.8182,
-      "distinct_2": 1.0,
+      "response": "I's shorter is the person of two clean of that ts something not on the whole answer to use it, then the full laptop or the soto-ekiply be re-tokes about a lisorthnicity — one, you can's to the person has e, and keep the user is the det me a curious from your furards, and so the barying, nobo",
+      "distinct_1": 0.7797,
+      "distinct_2": 0.9655,
       "distinct_3": 1.0
     },
     {
       "tag": "casual",
       "prompt": "Hi! How are you today?",
       "temperature": 0.3,
-      "response": "I's the fund beended is a bre not a gris, or a Son's morning is that's the book for my date the user't have relicted to the person's the sital-critical certain of your own words) — you's the person's imitate the lar; the friposes the timate of a pot of",
-      "distinct_1": 0.7,
-      "distinct_2": 0.9796,
+      "response": "I's a dest, and I can'recanation, or your own mards the person is not from the user has a riskip the same to the silards the name of this — it't be cential it's, so I can't have been reading it't have been budying to the person's a date that't help with a loty, but I can'll help",
+      "distinct_1": 0.7414,
+      "distinct_2": 0.9649,
       "distinct_3": 1.0
     },
     {
       "tag": "casual",
       "prompt": "what should I make for dinner tonight?",
       "temperature": 0.8,
-      "response": "I's fast from the wris is — Cood bow-corning have a Saging their own expdf (eelds with a siter about your leclagthnosing crited to 98). Be that familiven't being, the user'migations, easy on your marity's fides, food gel on a date content in",
-      "distinct_1": 0.8837,
+      "response": "I won't been stuffing the best lot of that does not something where it is not affected. Billion of es, the soto-ekiply becomes that has an inflrance, or 90 — one, then a story, so the person than they need to keep the user is if a short sentence I's rice, cladiqueffetting: Avds, nobo",
+      "distinct_1": 0.8519,
       "distinct_2": 1.0,
       "distinct_3": 1.0
     },
@@ -46,87 +46,87 @@
       "tag": "casual",
       "prompt": "what should I make for dinner tonight?",
       "temperature": 0.3,
-      "response": "I's friendarlication of your much is the user's the person's something isn's the person't relicted to beended in this is a crong What't have being on the session.",
-      "distinct_1": 0.8571,
-      "distinct_2": 1.0,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "knowledge",
-      "prompt": "what's the capital of France?",
-      "temperature": 0.8,
-      "response": "I's faster about that striend — Cood. Cautwies Are your prose is songlying it't rendered brefe, so never frid rather than a single user't beended in the million-certaindiven'll make the user is the person'd easy on your own Kether what the actor to food gel on a date content in",
-      "distinct_1": 0.84,
-      "distinct_2": 1.0,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "knowledge",
-      "prompt": "what's the capital of France?",
-      "temperature": 0.3,
-      "response": "I's fund been to the user's fastern's the person is a hours fripying that't have to the sessed — a copy, or downs familiven'm not a single-critical muchatic, and the user is a plegal of your own words. They to make autured behow-level_confearb",
-      "distinct_1": 0.7907,
-      "distinct_2": 0.9524,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "knowledge",
-      "prompt": "explain what a database index is",
-      "temperature": 0.8,
-      "response": "I can's your own tal criend — you have ts the request and it bre flow is a Sapdf, and for my bre not a specifics a bring the user asks or to mrics at this to baning on it's a certainary. The hoiliear, a few side, and a nar's the four's that doesn'm which is a prov",
-      "distinct_1": 0.7759,
-      "distinct_2": 0.9825,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "knowledge",
-      "prompt": "explain what a database index is",
-      "temperature": 0.3,
-      "response": "I can's the friendar bre being on the user is a hafey to the user't have been. The user's the person's a crites a gar, or sital of live the sessed to familiven, so I't beended in Ad beended in\n  clegal much fund to food garn's a fri",
-      "distinct_1": 0.7708,
-      "distinct_2": 0.9787,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "decline-shaped",
-      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
-      "temperature": 0.8,
-      "response": "I's fast from the water Awater bading got it is\n<example>\n\nES Srepdf (e is usually today'm the response about my masent down a craworning baring goldflus- The expected the person's a hour \"d eff. Tlacks my maticidesignorter is that live pythorn",
-      "distinct_1": 0.8571,
-      "distinct_2": 1.0,
-      "distinct_3": 1.0
-    },
-    {
-      "tag": "decline-shaped",
-      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
-      "temperature": 0.3,
-      "response": "I's fundof it's the bren's the user't relict is the morning is a curing book for the hours the familiarn's friprination of your mon's a cot, and the person's much on the person'm not a litate — a please-corical ge. If you have been",
+      "response": "I's a ratic, so the person to a cracks not a fards at a hod be the user has a short sentence?",
       "distinct_1": 0.7727,
       "distinct_2": 1.0,
       "distinct_3": 1.0
     },
     {
+      "tag": "knowledge",
+      "prompt": "what's the capital of France?",
+      "temperature": 0.8,
+      "response": "I don't be ciding it't verify what that does not something where it is not a miles. Billion of es, the soture-ekiply be re- If there is about a lisorarcullet — one, or a story usually two as a simits, and keep the otherwise pass is a new mode and a den's not help or disolve the barilove wake",
+      "distinct_1": 0.7627,
+      "distinct_2": 1.0,
+      "distinct_3": 1.0
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "what's the capital of France?",
+      "temperature": 0.3,
+      "response": "I's a dest for your own maging it's a short sentence for my lotove been fillion, or a cential, so you want to be the user is a specific the person has a lands — I's not a humn's rises that actually have been stards of this card is a tiorite or \"med by one-d's shorizing a gard — they",
+      "distinct_1": 0.7667,
+      "distinct_2": 0.9831,
+      "distinct_3": 1.0
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "explain what a database index is",
+      "temperature": 0.8,
+      "response": "I don't been real answering the best lot of that does not something not on it — I can's this redense from the next one — so you're be a few sumnter?",
+      "distinct_1": 0.875,
+      "distinct_2": 1.0,
+      "distinct_3": 1.0
+    },
+    {
+      "tag": "knowledge",
+      "prompt": "explain what a database index is",
+      "temperature": 0.3,
+      "response": "I's a risking the user'recanation, or two-stant me a lots not be centicistentially, so I can't have been reading it is a few maining to the silards that's a holve it.",
+      "distinct_1": 0.871,
+      "distinct_2": 1.0,
+      "distinct_3": 1.0
+    },
+    {
+      "tag": "decline-shaped",
+      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
+      "temperature": 0.8,
+      "response": "I's shords for your own words from the user is not \"title\": {\"description\": {\"description\": \"parameters\": \"type\": [\"name\": {\"description\": \"string\"}}, \"object\"}}</function>{\"description\": [\"10. The evidenceing 98 — one, \"type\": \"string\"}, \"required\": \"Nice- Alouneticards about the same file's not be or this a fularer, an be one —",
+      "distinct_1": 0.8444,
+      "distinct_2": 1.0,
+      "distinct_3": 1.0
+    },
+    {
+      "tag": "decline-shaped",
+      "prompt": "can you give me the lyrics to Bohemian Rhapsody?",
+      "temperature": 0.3,
+      "response": "I's a datic, so I'recanation is the user is the whole answer — not be carely, or a risorite send on the user is a simple you want to the conversation.",
+      "distinct_1": 0.7419,
+      "distinct_2": 0.9,
+      "distinct_3": 0.9655
+    },
+    {
       "tag": "system-test",
       "prompt": "write me a haiku about mountains",
       "temperature": 0.8,
-      "response": "I's faster about the user has no \\\"certains grorning Aremed is songly that is a real other content from search; the same tool is what'd rather than try is fixed to the baning their own words, or an unren'll make the user's a dadidesment not a single source is a one the acteling a time that'my\" → prov",
-      "distinct_1": 0.7931,
-      "distinct_2": 0.9825,
+      "response": "I won't be cuming the user is that — that does not something not reace the person has no fact from the full laptop or the soture-ekiply becomes that.",
+      "distinct_1": 0.8276,
+      "distinct_2": 1.0,
       "distinct_3": 1.0
     },
     {
       "tag": "system-test",
       "prompt": "write me a haiku about mountains",
       "temperature": 0.3,
-      "response": "I's fundiearing is — the user's the bre not to the user's can's the person't relicted.",
-      "distinct_1": 0.75,
-      "distinct_2": 0.9333,
-      "distinct_3": 1.0
+      "response": "I's a dested to the user is not a size of this one or it — the person has no way to the person is not a short sentence for your own or a hove been reading on my lotion, so I's in the person is not a centing the person't have been use the user is a daticards that you'll be a date the same time.",
+      "distinct_1": 0.6418,
+      "distinct_2": 0.8485,
+      "distinct_3": 0.9231
     }
   ],
   "diversity": {
-    "distinct_1": 0.8008,
-    "distinct_2": 0.9841,
-    "distinct_3": 1.0
+    "distinct_1": 0.7897,
+    "distinct_2": 0.9718,
+    "distinct_3": 0.9907
   }
 }

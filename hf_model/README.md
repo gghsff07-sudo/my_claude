@@ -34,7 +34,8 @@ questions or produce coherent sentences (see "Evaluation" below).
   bias-free fused QKV, tied input/output embeddings. Context length 512.
 - Tokenizer: byte-level BPE (vocab 2,048 = 256 bytes + 1789 learned merges +
   3 specials), trained from scratch on the training split only.
-- Weights: run2 final checkpoint (step 749), fp32 safetensors. The tied LM head
+- Weights: run3 checkpoint (step 399, v0.3.0 retrain on the doubled dialogue
+  corpus with the leak-free split), fp32 safetensors. The tied LM Head
   weight is stored once (`tok_emb.weight`) and re-tied on load.
 - Generation: `model.generate()` supports `temperature`, `top_p`, `top_k`,
   `max_new_tokens`, `repetition_penalty` with a KV cache.
@@ -83,40 +84,49 @@ Assistant: ...
 
 ## Training data
 
-Trained on an 18-document in-repo corpus (90/10 document-level split, seed 42):
+Trained on a 30-document in-repo corpus (90/10 document-level split, seed 42):
 
 - The "Claude Fable 5.1" reference document (~270 KB)
 - 5 research/design documents written during the project
-- 11 short synthetic Fable-style dialogue files (User:/Assistant: turns)
+- 23 short synthetic Fable-style dialogue files (User:/Assistant: turns),
+  doubled in v0.3.0 with multi-turn, clarification, correction, comparison,
+  step-by-step, definition, summary, brainstorming, smalltalk, closing,
+  refusal-with-alternative, and hedging styles
 
-run2 upweighted the dialogue files 6× to reinforce the chat register. The total
-corpus is a few hundred KB of English text — far too small for general language
-ability, by design. No web scrape, no external datasets.
+run3 upweighted the dialogue files 6× from the training split only (no
+validation document is ever trained on — earlier runs had a leakage bug,
+documented in the repo's CHANGELOG). The total corpus is ~0.5 MB of English
+text — far too small for general language ability, by design. No web scrape,
+no external datasets.
 
 Training: AdamW, peak lr 3e-4, 100-step warmup, cosine decay to 10%, gradient
-clip 1.0, batch 8×512 tokens, CPU only, ~750 steps in total across two runs
-(600 plain + 150 resumed with dialogue upweighting).
+clip 1.0, batch 8×512 tokens, CPU only; run3 ran 650 steps (early stop, best
+at step 399) with a tokenizer retrained on the expanded corpus.
 
 ## Evaluation (honest numbers)
 
 | Split | Loss | Perplexity |
 | --- | --- | --- |
-| train | 3.6209 | 37.37 |
-| val | 4.1600 | 64.07 |
+| train | 4.3574 | 78.05 |
+| val | 5.0893 | 162.27 |
 
 Perplexity is **on this corpus only** — a corpus-fit number, not a
 general-language number. Caveats, stated plainly:
 
-- run2's val split shares genre and phrasing patterns with the upweighted
-  training dialogues, so val ppl 64.07 flatters the model somewhat.
-- The train/val gap (3.62 vs 4.16) shows substantial memorization.
+- run3's validation split (3 held-out documents) was never trained on: the
+  earlier run2 number (val 4.16) was flattered by a data leak in the
+  dialogue upweighting, so run3's 5.09 is the first fully clean figure —
+  see the repo's EVAL.md for the run history.
+- The corpus doubled between runs while the step budget stayed at 800, so
+  per-document exposure dropped (train 4.36 vs run2's 3.62) — less
+  memorization, same register.
 - Sample generations are register-imitation, not coherent answers. A verbatim
-  example (temperature 0.8): *"I's this is story is that't leave as the
-  one-15" and you to beeny and hurborry is usually search — segoy, or I'm the
-  user't render it't being matter how you need to were food and a ca- Clalated
-  — your holarning are mode?"*
+  example (temperature 0.8): *"I's shorter is the person of two clean of that
+  ts something not on the whole answer to use it, then the full laptop or the
+  soto-ekiply be re-tokes abo"*
 - The chat scaffold (User:/Assistant: turns, `<|eos|>` stops) works
   mechanically — short turns, clean stops — but the content is word soup.
+- Diversity (distinct-1/2/3 over the 12 eval samples): 0.790 / 0.972 / 0.991.
 
 The full evaluation with sample tables is [EVAL.md in the GitHub repo]
 (https://github.com/gghsff07-sudo/my_claude/blob/main/EVAL.md).

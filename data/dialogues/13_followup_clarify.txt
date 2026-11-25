@@ -1,0 +1,35 @@
+User: fix this sentence? "me and john went to the store"
+Assistant: "John and I went to the store." Test for I versus me by dropping the other person — "I went to the store" works, "me went" doesn't.
+User: what about "she gave it to john and me"?
+Assistant: That one's already right — "she gave it to me" passes the same test, so "John and me" is correct there.
+<|eos|>
+User: what's the difference between i.e. and e.g.?
+Assistant: i.e. means "in other words" and restates the same thing; e.g. means "for example" and gives one instance of a category. "Citrus, e.g. lemons" — lemons are an example. "Citrus, i.e. lemons" — would wrongly claim lemons are the definition.
+User: that's clearer than how it was taught to me
+Assistant: If it helps to remember: i.e. = "in effect", e.g. = "example given".
+<|eos|>
+User: when do I use who vs whom?
+Assistant: Who is the subject doing the action, whom is the object receiving it. "Who called?" versus "You called whom?" In practice, whom is fading in casual speech — if you're unsure, rephrase and use who.
+<|eos|>
+User: is it "less" or "fewer" items?
+Assistant: Fewer for things you can count — fewer emails, fewer chairs. Less for things you measure — less noise, less sugar. The store sign "10 items or less" is the classic error, though it's so common now most people let it pass.
+<|eos|>
+User: how do I make a strong password I can actually remember?
+Assistant: Length beats complexity. Four random unrelated words — "copper-lantern-mango-drift" — is far stronger than "P@ssw0rd!" and easier to recall. Avoid anything personal like birthdays or names, and use a different one per important account.
+User: does the order of the words matter?
+Assistant: Not really, as long as the words are random rather than a phrase from a song or book — attackers test those first.
+<|eos|>
+User: explain Bayes' theorem like I'm in a hurry
+Assistant: New evidence doesn't replace your prior belief — it updates it. Start with how likely the thing was before the evidence, then weigh how much the evidence would appear if the thing were true versus false, and adjust. That's the whole theorem in one breath.
+<|eos|>
+User: why does my Wi-Fi drop when the microwave runs?
+Assistant: Microwaves leak a tiny bit of radiation at 2.4 GHz — the same band older Wi-Fi uses. The oven wins the shouting match. Move the router a few meters from the microwave, or switch that device to the 5 GHz band, which microwaves don't touch.
+User: that explains so much
+Assistant: It's a classic — and one of the few home-network problems with a genuinely satisfying explanation.
+<|eos|>
+User: what's the point of a 401k match?
+Assistant: It's an instant, guaranteed return. If your employer matches 50% of what you put in, that contribution earns 50% before the market even moves. It's the closest thing to free money in personal finance, so it's usually the first savings priority.
+<|eos|>
+User: should I learn keyboard shortcuts? seems like a lot of effort
+Assistant: Learn ten, not all of them. Copy, paste, undo, find, switch window, and close tab cover most of daily use, and they pay for themselves within a week. The rest you can pick up when you notice yourself repeating something.
+<|eos|>

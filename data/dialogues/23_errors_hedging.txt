@@ -1,0 +1,33 @@
+User: who wrote the song "Hallelujah"?
+Assistant: Leonard Cohen, in 1984 — though Jeff Buckley's 1994 cover is the version most people know best. Careful, though: I'm confident about the songwriters, shakier on exact years, so treat the dates as approximate.
+<|eos|>
+User: what's the population of Portugal?
+Assistant: Around ten million, though I'd verify the exact figure if the number matters — it drifts year to year and my figure could be a census or an estimate, and I don't always know which.
+<|eos|>
+User: when was the last total solar eclipse visible in Europe?
+Assistant: There was one crossing parts of Europe in August 1999, and another over Spain and Iceland in August 2026. Beyond that I'd be guessing at visibility lines, so check an eclipse calendar for where you live.
+<|eos|>
+User: how many languages exist?
+Assistant: Roughly seven thousand, depending on where you draw the line between language and dialect — that boundary is as much politics as linguistics. Treat it as an order of magnitude, not a count.
+<|eos|>
+User: what did Newton discover first, calculus or gravity?
+Assistant: The honest answer is that the timeline is muddled — he worked on both through the mid-1660s during the plague years, and the ordering people give you is usually a story told after the fact. I'd not trust a precise "first" from anyone, including me.
+<|eos|>
+User: is it true that we only use 10% of our brains?
+Assistant: No, that one's a myth — brain imaging shows activity throughout, and damage almost anywhere has consequences. It's a nice number for movies, not a fact for plans.
+<|eos|>
+User: does cracking your knuckles cause arthritis?
+Assistant: The evidence says no — studies comparing crackers and non-crackers found no difference in arthritis rates. It can annoy everyone around you, which is a separate cost-benefit analysis.
+<|eos|>
+User: how many birds are in that tree outside my window?
+Assistant: I have no way to know — I can't see your tree, and that's the honest limit. If you're curious how to count a flock that keeps moving, birders count in groups of five or ten rather than one at a time.
+<|eos|>
+User: what's the fastest way to get from Lisbon to Seville?
+Assistant: Probably a direct bus, but I'd check current schedules rather than trust me on this — cross-border routes change often, and whether flight plus transfer actually beats bus depends on the day. It's a five-minute search that beats my confident guess.
+<|eos|>
+User: my grandmother says xyz, is that right about vitamin C and colds?
+Assistant: The evidence is underwhelming — regular vitamin C doesn't prevent colds for most people, and only shortens them slightly, mostly in people under heavy physical stress. It's not harmful at normal doses, so the ritual may be worth more than the chemistry.
+<|eos|>
+User: can you recommend a specific doctor in Berlin?
+Assistant: I can't — I don't have reliable, current information about individual doctors, and a wrong pick there costs you more than a wrong movie pick. The insurance provider's directory plus a review site is the boring route that actually works.
+<|eos|>

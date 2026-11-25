@@ -4,8 +4,9 @@ REPL:   python -m fable_lm.chat
 Single: python -m fable_lm.chat --prompt "hello"
 
 Tokens stream to the terminal as they are sampled (--no-stream to disable).
-Commands: /help, /temp X, /topp X, /seed N, /system TEXT, /reset, /save FILE,
-/quit. Malformed commands print a usage hint instead of crashing.
+Commands: /help, /temp X, /topp X, /topk N, /maxnew N, /seed N, /system TEXT,
+/reset, /save FILE, /quit. Malformed commands print a usage hint instead of
+crashing.
 """
 
 from __future__ import annotations
@@ -35,11 +36,13 @@ DEFAULT_SYSTEM = (
 USAGE = {
     "temp": "/temp X      set temperature (e.g. 0.8)",
     "topp": "/topp X      set top-p (e.g. 0.9)",
+    "topk": "/topk N      set top-k (e.g. 50, 0 disables)",
+    "maxnew": "/maxnew N    set max new tokens per reply (e.g. 128)",
     "seed": "/seed N      set the sampling seed",
     "system": "/system TEXT set the system prompt",
     "save": "/save FILE   save the conversation so far",
     "reset": "/reset      clear the conversation history",
-    "quit": "/quit        leave the chat",
+    "quit": "/quit       leave the chat",
 }
 
 USAGE_TEXT = "commands: " + ", ".join(sorted(USAGE)) + " (/help for details)"
@@ -109,12 +112,21 @@ def load_model(ckpt_path: Path | str | None = None):
 def _prompt_ids(model, tok, history, user_text, system, max_new):
     prompt = build_prompt_tokens(tok, system, history, user_text)
     prompt += cue_tokens(tok)
-    # crop to context (leave room for the reply)
-    prompt = prompt[-(model.cfg.context_len - max_new - 1):]
+    # crop to context, leaving room for the reply. Guard the edge case where
+    # max_new >= context_len - 1: the old -(ctx - max_new - 1) slice turned
+    # positive and kept a long prompt; now we keep the last ctx tokens and let
+    # generation's cache-restart handle the overflow.
+    ctx = model.cfg.context_len
+    budget = ctx - min(max_new, ctx - 1) - 1
+    if budget > 0:
+        prompt = prompt[-budget:]
+    else:
+        prompt = prompt[-ctx:]
     return torch.tensor([prompt], dtype=torch.long)
 
 
-def reply(model, tok, history, user_text, system, temperature, top_p, max_new):
+def reply(model, tok, history, user_text, system, temperature, top_p, max_new,
+          top_k: int = 50):
     idx = _prompt_ids(model, tok, history, user_text, system, max_new)
     new_ids: list[int] = []
     for nxt in generate_stream(
@@ -123,13 +135,15 @@ def reply(model, tok, history, user_text, system, temperature, top_p, max_new):
         max_new_tokens=max_new,
         temperature=temperature,
         top_p=top_p,
+        top_k=top_k,
         eos_ids=(SPECIAL_IDS["<|eos|>"],),
     ):
         new_ids.append(int(nxt[0, 0]))
     return extract_assistant_text(tok, new_ids)
 
 
-def reply_stream(model, tok, history, user_text, system, temperature, top_p, max_new):
+def reply_stream(model, tok, history, user_text, system, temperature, top_p, max_new,
+                 top_k: int = 50):
     """Generator yielding text deltas as tokens are sampled; the return value
     (StopIteration.value) is the final cleaned assistant text, as reply().
 
@@ -146,6 +160,7 @@ def reply_stream(model, tok, history, user_text, system, temperature, top_p, max
         max_new_tokens=max_new,
         temperature=temperature,
         top_p=top_p,
+        top_k=top_k,
         eos_ids=(SPECIAL_IDS["<|eos|>"],),
     ):
         new_ids.append(int(nxt[0, 0]))
@@ -176,12 +191,12 @@ def parse_command(line: str) -> tuple[str, str] | None:
     arg = parts[1].strip() if len(parts) > 1 else ""
     if name in ("help", "reset", "quit"):
         return name, ""
-    if name in ("temp", "topp", "seed", "system", "save"):
+    if name in ("temp", "topp", "topk", "maxnew", "seed", "system", "save"):
         if not arg:
             return "error", f"usage: {USAGE[name]}"
         if name in ("temp", "topp") and _to_float(arg) is None:
             return "error", f"usage: {USAGE[name]} (a number, e.g. 0.8)"
-        if name == "seed" and _to_int(arg) is None:
+        if name in ("topk", "maxnew", "seed") and _to_int(arg) is None:
             return "error", f"usage: {USAGE[name]} (an integer)"
         return name, arg
     return "error", f"unknown command {line!r} — {USAGE_TEXT}"
@@ -236,6 +251,18 @@ def _run_repl(model, tok, args, system, history) -> None:
                 args.top_p = _to_float(arg)
                 print(f"top_p = {args.top_p}")
                 continue
+            if name == "topk":
+                args.top_k = _to_int(arg)
+                print(f"top_k = {args.top_k}")
+                continue
+            if name == "maxnew":
+                n = _to_int(arg)
+                if n < 1:
+                    print("max new tokens must be at least 1")
+                    continue
+                args.max_new = n
+                print(f"max new tokens = {n}")
+                continue
             if name == "seed":
                 torch.manual_seed(_to_int(arg))
                 print(f"seed = {arg}")
@@ -255,11 +282,13 @@ def _run_repl(model, tok, args, system, history) -> None:
         print("Assistant:", end=" ", flush=True)
         if args.no_stream:
             text = reply(model, tok, history, user, system,
-                         args.temperature, args.top_p, args.max_new)
+                         args.temperature, args.top_p, args.max_new,
+                         top_k=args.top_k)
             print(text)
         else:
             gen = reply_stream(model, tok, history, user, system,
-                               args.temperature, args.top_p, args.max_new)
+                               args.temperature, args.top_p, args.max_new,
+                               top_k=args.top_k)
             while True:
                 try:
                     delta = next(gen)
@@ -278,6 +307,8 @@ def main() -> None:
     ap.add_argument("--system", type=str, default=DEFAULT_SYSTEM)
     ap.add_argument("--temperature", type=float, default=0.8)
     ap.add_argument("--top-p", type=float, default=0.9)
+    ap.add_argument("--top-k", type=int, default=50,
+                    help="top-k sampling (0 disables)")
     ap.add_argument("--max-new", type=int, default=128)
     ap.add_argument("--no-stream", action="store_true", help="print the reply only when finished")
     ap.add_argument("--checkpoint", type=str, default="")
@@ -290,7 +321,7 @@ def main() -> None:
 
     if args.prompt:
         print(reply(model, tok, history, args.prompt, system,
-                    args.temperature, args.top_p, args.max_new))
+                    args.temperature, args.top_p, args.max_new, top_k=args.top_k))
         return
 
     _run_repl(model, tok, args, system, history)

@@ -1,0 +1,35 @@
+User: what is inflation, in one sentence?
+Assistant: Inflation is prices rising on average across the economy, which means each unit of money buys a little less over time.
+User: what causes it?
+Assistant: Too much money chasing too few goods, rising production costs passed on to buyers, or shortages that let sellers raise prices — usually a blend. The argument between economists is mostly about which one dominates when.
+<|eos|>
+User: define machine learning
+Assistant: Machine learning is programming by example instead of by rule — you show a system many cases and it adjusts itself to match the patterns, rather than a person writing step-by-step instructions for every situation.
+<|eos|>
+User: what's an API?
+Assistant: An application programming interface — a defined way for one program to request something from another. Like a restaurant counter: you order from the menu, the kitchen makes it, and you don't need to know how the stove works.
+<|eos|>
+User: what does "opportunity cost" mean?
+Assistant: The value of the best thing you gave up to do what you chose. An evening at the concert costs the ticket money plus the quiet night at home you didn't have — that forgone night is the opportunity cost.
+<|eos|>
+User: what's the cloud, actually?
+Assistant: Other people's computers that you rent. "The cloud" means your files and programs live in data centers run by providers, reachable from anywhere — the technology is ordinary servers, arranged and billed so it feels like a utility.
+<|eos|>
+User: what is compounding?
+Assistant: Growth earning growth. If a 100 euro deposit gains 5%, it becomes 105; the next 5% builds on 105, not 100. Slow at first, then steep — the same mechanic applies to interest, skills, and habits.
+<|eos|>
+User: what's a "runway" for a company?
+Assistant: How many months the company can keep operating before the money runs out, given current spending. Two years of runway means burning what's left at today's pace takes two years to reach zero.
+<|eos|>
+User: define entropy
+Assistant: A measure of how many microscopic arrangements would look the same to you — disorder, roughly. Low entropy: arrangements are few and special. High entropy: nearly any arrangement looks the same, which is why rooms drift toward mess and heat spreads out: there are simply far more messy states than tidy ones.
+<|eos|>
+User: what's a tariff?
+Assistant: A tax a government puts on imported goods at the border. It makes foreign products pricier locally, which can protect domestic makers but raises costs for buyers of those goods.
+<|eos|>
+User: what does "net zero" mean?
+Assistant: Emissions you add equal emissions you remove — the atmosphere's balance sheet lands at zero. It doesn't mean no emissions at all; it means whatever is still emitted is matched by absorption or removal somewhere else.
+<|eos|>
+User: what is a placebo?
+Assistant: An effect, not a fake pill — improvement that comes from the treatment context rather than its active ingredient. The sugar pill is the classic example, but placebos also show why ritual, attention, and expectation are part of real medicine.
+<|eos|>

@@ -1,5 +1,58 @@
 # Changelog
 
+## v0.3.0 — data upgrade and honest retrain
+
+The v0.2.0 report's top recommendation was to retrain with the leak-free
+recipe and more dialogue data. This release does exactly that: the dialogue
+corpus roughly doubles, the model and tokenizer are retrained, and every
+shipped artifact is regenerated from the new run. The headline number moves
+the honest way — val loss 4.16 (leak-flattered) → 5.09 (clean, on a larger
+held-out split) — see EVAL.md's run3 section for why that is an improvement.
+
+### Added
+
+- **12 new dialogue files** (`data/dialogues/12-23_*.txt`, ~4.7k words ≈ the
+  existing corpus): multi-turn context use, clarification questions, being
+  corrected gracefully, structured comparisons, step-by-step instructions,
+  plain definitions, summaries, brainstorming, smalltalk variety, gratitude
+  and closings, refusals with alternatives, and calibrated hedging.
+- **`--top-k` in the chat CLI** and a `top_k` parameter on
+  `reply()`/`reply_stream()`; `/topk N` and `/maxnew N` REPL commands.
+- **`--checkpoint` in `fable_lm.eval`** (evaluate any checkpoint, not just
+  `checkpoints/best.pt`).
+- **`--fresh-tokenizer` in `fable_lm.train`**: retrain the BPE merges when the
+  corpus changes (the old behavior silently reused the cached tokenizer).
+- **`fable-bench` console entry point** — the generation benchmark moved into
+  `fable_lm/bench.py` (installed with the package); `scripts/bench_generation.py`
+  is now a thin wrapper.
+
+### Fixed
+
+- **Prompt-crop edge case** (`fable_lm/chat.py`): with `--max-new` ≥
+  context_len, `prompt[-(ctx - max_new - 1):]` turned into a positive slice
+  and kept a long prompt. The budget is now clamped, falling back to the last
+  `ctx` tokens (generation restarts its cache internally).
+- **Two non-hermetic HF tests** (`tests/test_hf_compat.py`): the greedy test
+  compared `generate()` — which silently inherited repetition_penalty 1.2 from
+  the saved `generation_config.json` — against a penalty-free manual loop, and
+  the sampling test asserted an exact length although a sampled EOS can end
+  generation early. Both passed on run2's weights by luck and failed on
+  run3's; they now pin the generation parameters explicitly.
+
+### Changed
+
+- **run3 retrain** (leak-free recipe, 800 steps, early stop at 650): best val
+  loss 5.0893 (ppl 162.27) at step 399; train 4.3574 (ppl 78.05). Shipped
+  checkpoint `models/fable-mini-final.pt`, tokenizer `data/tokenizer.json`,
+  HF folder, `results/eval_results.json`, and `results/run3_log.csv` all
+  regenerated from it; HF logits parity re-verified at 0.0 and tokenizer
+  parity 53/53.
+- Corpus 18 → 30 documents; val split 1 → 3 documents. The tokenizer is
+  retrained on the expanded corpus (still vocab 2048 / 1789 merges).
+- Test suite 76 → 79; `ruff check .` still clean.
+- `fable_lm.__version__` 0.2.0 → 0.3.0; EVAL.md gained a run3 section and the
+  run2 honesty note was sharpened with the confirmed leak.
+
 ## v0.2.0 — audit-driven upgrade
 
 A full-codebase audit found the v0.1.0 pipeline sound (53/53 tests, HF parity

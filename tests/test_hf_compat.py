@@ -108,12 +108,14 @@ def test_generate_sampling_controls(hf):
     out = hf.generate(
         ids,
         max_new_tokens=10,
+        min_new_tokens=10,  # an early-sampled eos must not shorten the output
         do_sample=True,
         temperature=0.9,
         top_p=0.9,
         top_k=40,
         repetition_penalty=1.2,
         pad_token_id=256,
+        eos_token_id=257,
     )
     assert out.shape == (1, 15)
 
@@ -121,8 +123,15 @@ def test_generate_sampling_controls(hf):
 def test_generate_greedy_deterministic_and_cache_consistent(hf):
     torch.manual_seed(2)
     ids = torch.randint(0, 2048, (1, 8))
-    g1 = hf.generate(ids, max_new_tokens=8, do_sample=False, num_beams=1, pad_token_id=256)
-    g2 = hf.generate(ids, max_new_tokens=8, do_sample=False, num_beams=1, pad_token_id=256)
+    # repetition_penalty=1.0: the manual argmax loop below applies no penalty,
+    # and generate() would otherwise inherit 1.2 from the saved
+    # generation_config.json — model-dependent argmax flips made the old,
+    # unpinned comparison fail on some checkpoints (run3) and pass on others
+    # (run2) purely by luck of the weights.
+    g1 = hf.generate(ids, max_new_tokens=8, do_sample=False, num_beams=1,
+                     pad_token_id=256, repetition_penalty=1.0)
+    g2 = hf.generate(ids, max_new_tokens=8, do_sample=False, num_beams=1,
+                     pad_token_id=256, repetition_penalty=1.0)
     assert torch.equal(g1, g2)
     # greedy generate must equal manual argmax stepping with the cache
     with torch.no_grad():
